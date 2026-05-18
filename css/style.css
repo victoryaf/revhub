@@ -50,7 +50,7 @@ header {
     justify-content: space-between;
 }
 
-/* === LOGO === */
+/* Logo */
 .logo {
     display: flex;
     align-items: center;
@@ -72,6 +72,38 @@ header {
 .logo span strong {
     color: #C0392B;
     font-weight: bold;
+}
+
+/* Navegación */
+nav {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+nav a {
+    color: #8E8E93;
+    font-size: 14px;
+}
+
+nav a:hover {
+    color: #fff;
+}
+
+/* Icono con texto en nav */
+.nav-icono {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #8E8E93;
+}
+
+.nav-icono:hover {
+    color: #fff;
+}
+
+.nav-icono svg {
+    flex-shrink: 0;
 }
 
 /* ============================================================
@@ -132,6 +164,10 @@ footer {
     background: #922B21;
 }
 
+.btn-full {
+    width: 100%;
+}
+
 .btn-outline {
     display: inline-block;
     background: transparent;
@@ -158,6 +194,10 @@ footer {
     font-family: Arial, sans-serif;
     border: 1px solid #F5B7B1;
     cursor: pointer;
+}
+
+.btn-peligro:hover {
+    background: #F5B7B1;
 }
 
 /* ============================================================
@@ -340,7 +380,7 @@ footer {
     margin-bottom: 6px;
 }
 
-.formulario .subtitulo {
+.subtitulo {
     font-size: 13px;
     color: #8E8E93;
     margin-bottom: 22px;
@@ -392,7 +432,7 @@ footer {
     font-size: 12px;
     color: #8E8E93;
     text-align: center;
-    margin-top: 16px;
+    margin-top: 14px;
 }
 
 .form-pie a {
@@ -419,11 +459,6 @@ footer {
 @media (max-width: 768px) {
     .eventos-grid  { grid-template-columns: 1fr; }
     .form-2col     { grid-template-columns: 1fr; }
-
     nav a:not(.btn) { display: none; }
-
-    .pie-inner {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+    .pie-inner     { flex-direction: column; align-items: flex-start; }
 }
