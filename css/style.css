@@ -1,0 +1,429 @@
+/* ============================================================
+   RevHub — Estilos globales
+   ============================================================ */
+
+/* === RESET === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #F5F5F0;
+    color: #1C1C1E;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+main {
+    flex: 1;
+}
+
+/* ============================================================
+   CABECERA
+   ============================================================ */
+header {
+    background: #1C1C1E;
+    border-bottom: 2px solid #C0392B;
+}
+
+.nav {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* === LOGO === */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+}
+
+.logo span {
+    color: #fff;
+    font-size: 20px;
+    font-weight: normal;
+    letter-spacing: 0.02em;
+}
+
+.logo span strong {
+    color: #C0392B;
+    font-weight: bold;
+}
+
+/* ============================================================
+   PIE DE PÁGINA
+   ============================================================ */
+footer {
+    background: #1C1C1E;
+    border-top: 2px solid #C0392B;
+    padding: 24px 20px;
+    margin-top: 60px;
+}
+
+.pie-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.pie-inner p {
+    color: #8E8E93;
+    font-size: 13px;
+}
+
+.pie-inner div {
+    display: flex;
+    gap: 20px;
+}
+
+.pie-inner a {
+    color: #8E8E93;
+    font-size: 12px;
+}
+
+.pie-inner a:hover {
+    color: #fff;
+}
+
+/* ============================================================
+   BOTONES
+   ============================================================ */
+.btn {
+    display: inline-block;
+    background: #C0392B;
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #922B21;
+}
+
+.btn-outline {
+    display: inline-block;
+    background: transparent;
+    color: #1C1C1E;
+    padding: 8px 18px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    border: 1px solid #E5E5EA;
+    cursor: pointer;
+}
+
+.btn-outline:hover {
+    border-color: #8E8E93;
+}
+
+.btn-peligro {
+    display: inline-block;
+    background: #FDEDEC;
+    color: #922B21;
+    padding: 8px 18px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    border: 1px solid #F5B7B1;
+    cursor: pointer;
+}
+
+/* ============================================================
+   CONTENEDOR
+   ============================================================ */
+.contenedor {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+/* ============================================================
+   BANNER PRINCIPAL
+   ============================================================ */
+.banner {
+    background: #1C1C1E;
+    padding: 60px 20px;
+}
+
+.banner-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.banner h1 {
+    color: #fff;
+    font-size: 30px;
+    margin-bottom: 14px;
+    line-height: 1.3;
+}
+
+.banner h1 span {
+    color: #C0392B;
+}
+
+.banner p {
+    color: #8E8E93;
+    font-size: 15px;
+    margin-bottom: 24px;
+    max-width: 480px;
+    line-height: 1.6;
+}
+
+.banner-btns {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.banner-btns .enlace {
+    color: #8E8E93;
+    font-size: 14px;
+}
+
+.banner-btns .enlace:hover {
+    color: #fff;
+}
+
+/* ============================================================
+   ENCABEZADO DE SECCIÓN
+   ============================================================ */
+.seccion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.seccion-header h2 {
+    font-size: 18px;
+}
+
+.seccion-header a {
+    font-size: 13px;
+    color: #C0392B;
+}
+
+/* ============================================================
+   GRID Y TARJETAS DE EVENTO
+   ============================================================ */
+.eventos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.tarjeta {
+    background: #fff;
+    border: 1px solid #E5E5EA;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.tarjeta-imagen {
+    width: 100%;
+    height: 150px;
+    background: #2C2C2E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tarjeta-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.tarjeta-imagen span {
+    color: #636366;
+    font-size: 12px;
+}
+
+.tarjeta-body {
+    padding: 12px;
+}
+
+.tarjeta-body h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.tarjeta-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #8E8E93;
+    margin-bottom: 4px;
+}
+
+.tarjeta-meta svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    color: #C0392B;
+}
+
+.tarjeta-footer {
+    padding: 10px 12px;
+    border-top: 1px solid #E5E5EA;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* ============================================================
+   BADGES TIPO EVENTO
+   ============================================================ */
+.badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-quedada     { background: #C0392B; color: #fff; }
+.badge-ruta        { background: #27AE60; color: #fff; }
+.badge-exposicion  { background: #2980B9; color: #fff; }
+.badge-competicion { background: #8E44AD; color: #fff; }
+.badge-otro        { background: #8E8E93; color: #fff; }
+
+/* ============================================================
+   FORMULARIOS
+   ============================================================ */
+.formulario {
+    background: #fff;
+    border: 1px solid #E5E5EA;
+    border-radius: 8px;
+    padding: 28px;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.formulario h2 {
+    font-size: 20px;
+    margin-bottom: 6px;
+}
+
+.formulario .subtitulo {
+    font-size: 13px;
+    color: #8E8E93;
+    margin-bottom: 22px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #E5E5EA;
+    border-radius: 5px;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    color: #1C1C1E;
+    background: #fff;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #C0392B;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.form-pie {
+    font-size: 12px;
+    color: #8E8E93;
+    text-align: center;
+    margin-top: 16px;
+}
+
+.form-pie a {
+    color: #C0392B;
+}
+
+/* ============================================================
+   ALERTAS
+   ============================================================ */
+.alerta {
+    padding: 10px 14px;
+    border-radius: 5px;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+
+.alerta-error { background: #FDEDEC; color: #922B21; border: 1px solid #F5B7B1; }
+.alerta-ok    { background: #EAFAF1; color: #1E8449; border: 1px solid #A9DFBF; }
+.alerta-info  { background: #EBF5FB; color: #1A5276; border: 1px solid #AED6F1; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    .eventos-grid  { grid-template-columns: 1fr; }
+    .form-2col     { grid-template-columns: 1fr; }
+
+    nav a:not(.btn) { display: none; }
+
+    .pie-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
