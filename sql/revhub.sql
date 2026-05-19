@@ -102,12 +102,20 @@ CREATE TABLE mensajes (
   FOREIGN KEY (id_evento)       REFERENCES eventos(id_evento) ON DELETE SET NULL
 );
 
+CREATE TABLE recuperar_password (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario  INT          NOT NULL,
+    token       VARCHAR(64)  NOT NULL,
+    expira      DATETIME     NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+);
+
 -- ============================================================
 -- DATOS DE PRUEBA
 -- ============================================================
 
 INSERT INTO usuarios (nombre, apellidos, username, email, contrasena, rol) VALUES
-('Victoria', 'Ausín Fernández',  'victoria', 'victoria@revhub.es', '$2y$10$dHt41aYNkx3QO94u.1lqH.JjFbw2KxN6bb30gAEvCL5udXmfY.Qz.', 'admin'),
+('Victoria', 'Ausín Fernández',  'victoria', 'vausinfernandez@gmail.com', '$2y$10$dHt41aYNkx3QO94u.1lqH.JjFbw2KxN6bb30gAEvCL5udXmfY.Qz.', 'admin'),
 ('Antonio',  'Martínez López',   'antonio',  'antonio@revhub.es',  '$2y$10$dHt41aYNkx3QO94u.1lqH.JjFbw2KxN6bb30gAEvCL5udXmfY.Qz.', 'organizador'),
 ('Lucía',    'Pérez García',     'lucia',    'lucia@revhub.es',    '$2y$10$dHt41aYNkx3QO94u.1lqH.JjFbw2KxN6bb30gAEvCL5udXmfY.Qz.', 'usuario'),
 ('Carlos',   'Rodríguez Vidal',  'carlos',   'carlos@revhub.es',   '$2y$10$dHt41aYNkx3QO94u.1lqH.JjFbw2KxN6bb30gAEvCL5udXmfY.Qz.', 'usuario'),

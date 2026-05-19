@@ -18,21 +18,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
         $email_esc = mysqli_real_escape_string($conexion, $email);
 
         $resultado = mysqli_query($conexion,
-            "SELECT * FROM usuarios
-             WHERE email = '$email_esc' OR username = '$email_esc'"
+            "SELECT * FROM usuarios WHERE email = '$email_esc' OR username = '$email_esc'"
         );
 
         if (mysqli_num_rows($resultado) === 1) {
             $usuario = mysqli_fetch_assoc($resultado);
 
             if (password_verify($password, $usuario['contrasena'])) {
-                $_SESSION['usuario']  = $usuario['id_usuario'];
-                $_SESSION['username'] = $usuario['username'];
-                $_SESSION['nombre']   = $usuario['nombre'];
-                $_SESSION['rol']      = $usuario['rol'];
+                if ($usuario['rol'] === 'bloqueado') {
+                    $error_login = 'Tu cuenta ha sido bloqueada. Contacta con el administrador.';
+                } else {
+                    $_SESSION['usuario']  = $usuario['id_usuario'];
+                    $_SESSION['username'] = $usuario['username'];
+                    $_SESSION['nombre']   = $usuario['nombre'];
+                    $_SESSION['rol']      = $usuario['rol'];
 
-                header('Location: ' . $_SERVER['REQUEST_URI']);
-                exit;
+                    $url = strtok($_SERVER['REQUEST_URI'], '?');
+                    header('Location: ' . $url);
+                    exit;
+                }
             } else {
                 $error_login = 'Contraseña incorrecta.';
             }
@@ -48,9 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RevHub</title>
+    <link rel="icon" type="image/png" href="/revhub/img/logo.png">
     <link rel="stylesheet" href="/revhub/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="/revhub/img/logo.png">
 </head>
 <body>
 
@@ -92,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
 </header>
 
 <!-- ===== MODAL LOGIN ===== -->
-<div class="modal-overlay" id="modal-login" <?= $error_login ? 'style="display:flex;"' : '' ?>>
+<div class="modal-overlay" id="modal-login" <?= ($error_login || isset($_GET['login'])) ? 'style="display:flex;"' : '' ?>>
     <div class="modal">
         <button class="modal-cerrar" onclick="cerrarModal('modal-login')">&times;</button>
         <h2>Iniciar sesión</h2>
