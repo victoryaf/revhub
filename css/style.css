@@ -1,6 +1,21 @@
 /* ============================================================
-   RevHub — Estilos globales
+   RevHub — Hoja de estilos global
+   Tipografía: Inter (Google Fonts)
+   Paleta:
+     Rojo motor  #C0392B — botones primarios y elementos destacados
+     Rojo oscuro #922B21 — hover y estados de bloqueo
+     Asfalto     #1C1C1E — cabecera y texto principal
+     Acero       #2C2C2E — fondos secundarios
+     Cromo       #8E8E93 — texto secundario y metadatos
+     Fondo       #F5F5F0 — fondo general
+     Blanco      #FFFFFF — tarjetas y formularios
+     Verde       #27AE60 — estado activo
+     Ambar       #B7770D — estado pendiente
+     Rojo claro  #F9EBEA — botón acción en tarjeta
    ============================================================ */
+
+/* === FUENTE === */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
 
 /* === RESET === */
 * {
@@ -10,7 +25,8 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 14px;
     background: #F5F5F0;
     color: #1C1C1E;
     min-height: 100vh;
@@ -65,13 +81,13 @@ header {
 .logo span {
     color: #fff;
     font-size: 20px;
-    font-weight: normal;
+    font-weight: 400;
     letter-spacing: 0.02em;
 }
 
 .logo span strong {
     color: #C0392B;
-    font-weight: bold;
+    font-weight: 500;
 }
 
 /* Navegación */
@@ -84,6 +100,7 @@ nav {
 nav a {
     color: #8E8E93;
     font-size: 14px;
+    font-weight: 400;
 }
 
 nav a:hover {
@@ -94,16 +111,13 @@ nav a:hover {
 .nav-icono {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     color: #8E8E93;
+    font-size: 14px;
 }
 
 .nav-icono:hover {
     color: #fff;
-}
-
-.nav-icono svg {
-    flex-shrink: 0;
 }
 
 /* ============================================================
@@ -147,25 +161,33 @@ footer {
 
 /* ============================================================
    BOTONES
+   Primario:      fondo rojo motor, texto blanco, esquinas redondeadas
+   Secundario:    fondo transparente, borde, texto oscuro
+   Acción tarjeta: fondo rojo claro, texto rojo motor
+   Destructivo:   texto rojo oscuro, fondo gris claro
    ============================================================ */
 .btn {
     display: inline-block;
     background: #C0392B;
     color: #fff;
     padding: 8px 18px;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 13px;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
+    font-weight: 500;
     border: none;
     cursor: pointer;
 }
 
 .btn:hover {
     background: #922B21;
+    color: #fff;
 }
 
 .btn-full {
     width: 100%;
+    text-align: center;
+    display: block;
 }
 
 .btn-outline {
@@ -173,9 +195,10 @@ footer {
     background: transparent;
     color: #1C1C1E;
     padding: 8px 18px;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 13px;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
+    font-weight: 500;
     border: 1px solid #E5E5EA;
     cursor: pointer;
 }
@@ -184,20 +207,38 @@ footer {
     border-color: #8E8E93;
 }
 
+.btn-accion {
+    display: inline-block;
+    background: #F9EBEA;
+    color: #C0392B;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: 'Inter', Arial, sans-serif;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-accion:hover {
+    background: #F5B7B1;
+}
+
 .btn-peligro {
     display: inline-block;
-    background: #FDEDEC;
+    background: #F5F5F0;
     color: #922B21;
     padding: 8px 18px;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 13px;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
+    font-weight: 500;
     border: 1px solid #F5B7B1;
     cursor: pointer;
 }
 
 .btn-peligro:hover {
-    background: #F5B7B1;
+    background: #FDEDEC;
 }
 
 /* ============================================================
@@ -225,6 +266,7 @@ footer {
 .banner h1 {
     color: #fff;
     font-size: 30px;
+    font-weight: 500;
     margin-bottom: 14px;
     line-height: 1.3;
 }
@@ -236,9 +278,10 @@ footer {
 .banner p {
     color: #8E8E93;
     font-size: 15px;
+    font-weight: 400;
     margin-bottom: 24px;
     max-width: 480px;
-    line-height: 1.6;
+    line-height: 1.7;
 }
 
 .banner-btns {
@@ -268,6 +311,7 @@ footer {
 
 .seccion-header h2 {
     font-size: 18px;
+    font-weight: 500;
 }
 
 .seccion-header a {
@@ -317,6 +361,7 @@ footer {
 
 .tarjeta-body h3 {
     font-size: 14px;
+    font-weight: 500;
     margin-bottom: 8px;
 }
 
@@ -329,18 +374,23 @@ footer {
     margin-bottom: 4px;
 }
 
-.tarjeta-meta svg {
-    width: 13px;
-    height: 13px;
-    flex-shrink: 0;
+.tarjeta-meta i {
     color: #C0392B;
+    font-size: 12px;
+    width: 14px;
 }
 
 .tarjeta-footer {
     padding: 10px 12px;
     border-top: 1px solid #E5E5EA;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.plazas {
+    font-size: 12px;
+    color: #8E8E93;
 }
 
 /* ============================================================
@@ -349,12 +399,12 @@ footer {
 .badge {
     display: inline-block;
     font-size: 10px;
-    font-weight: bold;
+    font-weight: 500;
     padding: 2px 8px;
     border-radius: 3px;
     margin-bottom: 8px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
 }
 
 .badge-quedada     { background: #C0392B; color: #fff; }
@@ -362,6 +412,13 @@ footer {
 .badge-exposicion  { background: #2980B9; color: #fff; }
 .badge-competicion { background: #8E44AD; color: #fff; }
 .badge-otro        { background: #8E8E93; color: #fff; }
+
+/* ============================================================
+   ESTADOS
+   ============================================================ */
+.estado-activo   { color: #27AE60; font-weight: 500; }
+.estado-pendiente{ color: #B7770D; font-weight: 500; }
+.estado-bloqueado{ color: #922B21; font-weight: 500; }
 
 /* ============================================================
    FORMULARIOS
@@ -377,6 +434,7 @@ footer {
 
 .formulario h2 {
     font-size: 20px;
+    font-weight: 500;
     margin-bottom: 6px;
 }
 
@@ -393,7 +451,7 @@ footer {
 .form-group label {
     display: block;
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 500;
     margin-bottom: 5px;
 }
 
@@ -403,9 +461,9 @@ footer {
     width: 100%;
     padding: 9px 12px;
     border: 1px solid #E5E5EA;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 13px;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
     color: #1C1C1E;
     background: #fff;
 }
@@ -444,7 +502,7 @@ footer {
    ============================================================ */
 .alerta {
     padding: 10px 14px;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 13px;
     margin-bottom: 16px;
 }
@@ -454,20 +512,8 @@ footer {
 .alerta-info  { background: #EBF5FB; color: #1A5276; border: 1px solid #AED6F1; }
 
 /* ============================================================
-   RESPONSIVE
+   FILTROS
    ============================================================ */
-@media (max-width: 768px) {
-    .eventos-grid  { grid-template-columns: 1fr; }
-    .form-2col     { grid-template-columns: 1fr; }
-    nav a:not(.btn) { display: none; }
-    .pie-inner     { flex-direction: column; align-items: flex-start; }
-}
-
-/* ============================================================
-   EVENTOS — Añadir al final de style.css
-   ============================================================ */
-
-/* Filtros */
 .filtros {
     display: flex;
     gap: 10px;
@@ -480,9 +526,9 @@ footer {
 .filtros input[type="text"] {
     padding: 8px 12px;
     border: 1px solid #E5E5EA;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 13px;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
     color: #1C1C1E;
     background: #fff;
 }
@@ -498,22 +544,12 @@ footer {
     border-color: #C0392B;
 }
 
-/* Total resultados */
 .total-resultados {
     font-size: 13px;
     color: #8E8E93;
     margin-bottom: 16px;
 }
 
-/* Plazas en tarjeta */
-.plazas {
-    font-size: 12px;
-    color: #8E8E93;
-    align-self: center;
-    flex: 1;
-}
-
-/* Sin resultados */
 .sin-resultados {
     font-size: 13px;
     color: #8E8E93;
@@ -523,8 +559,6 @@ footer {
 /* ============================================================
    DETALLE DE EVENTO
    ============================================================ */
-
-/* Volver */
 .volver {
     display: inline-block;
     font-size: 13px;
@@ -536,7 +570,6 @@ footer {
     color: #C0392B;
 }
 
-/* Layout detalle */
 .evento-layout {
     display: grid;
     grid-template-columns: 1fr 300px;
@@ -544,7 +577,6 @@ footer {
     align-items: start;
 }
 
-/* Imagen */
 .evento-imagen {
     width: 100%;
     height: 320px;
@@ -568,9 +600,9 @@ footer {
     font-size: 13px;
 }
 
-/* Título y descripción */
 .evento-main h1 {
     font-size: 24px;
+    font-weight: 500;
     margin: 10px 0 12px;
 }
 
@@ -581,7 +613,6 @@ footer {
     margin-bottom: 20px;
 }
 
-/* Grid metadatos */
 .evento-meta-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -601,19 +632,21 @@ footer {
 
 .meta-label {
     font-size: 11px;
+    font-weight: 500;
     color: #8E8E93;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
 }
 
 .meta-item span:last-child {
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 500;
 }
 
 /* Comentarios */
 .comentarios h3 {
     font-size: 16px;
+    font-weight: 500;
     margin-bottom: 14px;
 }
 
@@ -628,9 +661,9 @@ footer {
     width: 100%;
     padding: 9px 12px;
     border: 1px solid #E5E5EA;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 13px;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
     resize: vertical;
 }
 
@@ -660,6 +693,7 @@ footer {
 
 .comentario-header strong {
     font-size: 13px;
+    font-weight: 500;
 }
 
 .comentario-header span {
@@ -694,6 +728,7 @@ footer {
 
 .sidebar-card h4 {
     font-size: 14px;
+    font-weight: 500;
     margin-bottom: 12px;
     padding-bottom: 8px;
     border-bottom: 1px solid #E5E5EA;
@@ -740,15 +775,17 @@ footer {
 
 .lista-asistentes strong {
     color: #1C1C1E;
+    font-weight: 500;
 }
 
-/* Responsive detalle */
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (max-width: 768px) {
-    .evento-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .evento-meta-grid {
-        grid-template-columns: 1fr 1fr;
-    }
+    .eventos-grid      { grid-template-columns: 1fr; }
+    .form-2col         { grid-template-columns: 1fr; }
+    .evento-layout     { grid-template-columns: 1fr; }
+    .evento-meta-grid  { grid-template-columns: 1fr 1fr; }
+    .pie-inner         { flex-direction: column; align-items: flex-start; }
+    nav a:not(.btn)    { display: none; }
 }

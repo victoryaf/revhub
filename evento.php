@@ -1,5 +1,4 @@
 <?php include 'includes/cabecera.php'; ?>
-
 <?php
 include 'php/conexion.php';
 
@@ -8,11 +7,14 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     exit;
 }
 
-$id     = (int)$_GET['id'];
-$result = mysqli_query($conexion, "SELECT e.*, u.username, u.nombre AS org_nombre
-                                    FROM eventos e
-                                    JOIN usuarios u ON e.id_usuario = u.id_usuario
-                                    WHERE e.id_evento = $id");
+$id = (int)$_GET['id'];
+
+$result = mysqli_query($conexion,
+    "SELECT e.*, u.username, u.nombre AS org_nombre
+     FROM eventos e
+     JOIN usuarios u ON e.id_usuario = u.id_usuario
+     WHERE e.id_evento = $id"
+);
 
 if (mysqli_num_rows($result) === 0) {
     header('Location: /revhub/eventos.php');
@@ -21,19 +23,16 @@ if (mysqli_num_rows($result) === 0) {
 
 $evento = mysqli_fetch_assoc($result);
 
-// Número de inscritos
 $inscritos = mysqli_fetch_assoc(mysqli_query($conexion,
     "SELECT COUNT(DISTINCT id_usuario) as total FROM inscripciones WHERE id_evento = $id"
 ))['total'];
 
-// Comentarios
 $comentarios = mysqli_query($conexion,
     "SELECT c.*, u.username FROM comentarios c
      JOIN usuarios u ON c.id_usuario = u.id_usuario
      WHERE c.id_evento = $id ORDER BY c.fecha DESC"
 );
 
-// Asistentes
 $asistentes = mysqli_query($conexion,
     "SELECT DISTINCT u.username, v.marca, v.modelo
      FROM inscripciones i
@@ -42,18 +41,13 @@ $asistentes = mysqli_query($conexion,
      WHERE i.id_evento = $id"
 );
 
-// ¿Está inscrito el usuario?
 $inscrito = false;
 if (isset($_SESSION['usuario'])) {
     $uid = $_SESSION['usuario'];
-    $check = mysqli_query($conexion,
-        "SELECT id_inscripcion FROM inscripciones
-         WHERE id_usuario = $uid AND id_evento = $id"
-    );
+    $check = mysqli_query($conexion, "SELECT id_inscripcion FROM inscripciones WHERE id_usuario = $uid AND id_evento = $id");
     $inscrito = mysqli_num_rows($check) > 0;
 }
 
-// Procesar comentario
 $error_com = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
     if (!isset($_SESSION['usuario'])) {
@@ -63,10 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
     } else {
         $uid   = $_SESSION['usuario'];
         $texto = mysqli_real_escape_string($conexion, trim($_POST['comentario']));
-        mysqli_query($conexion,
-            "INSERT INTO comentarios (id_usuario, id_evento, texto)
-             VALUES ($uid, $id, '$texto')"
-        );
+        mysqli_query($conexion, "INSERT INTO comentarios (id_usuario, id_evento, texto) VALUES ($uid, $id, '$texto')");
         header("Location: /revhub/evento.php?id=$id");
         exit;
     }
@@ -75,25 +66,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
 
 <main>
     <div class="contenedor">
-
         <a href="/revhub/eventos.php" class="volver">&larr; Volver a eventos</a>
 
         <div class="evento-layout">
-
-            <!-- Contenido principal -->
             <div class="evento-main">
-
-                <!-- Imagen -->
                 <div class="evento-imagen">
                     <?php if ($evento['cartel']): ?>
-                        <img src="/revhub/img/eventos/<?= htmlspecialchars($evento['cartel']) ?>"
-                             alt="<?= htmlspecialchars($evento['nombre']) ?>">
+                        <img src="/revhub/img/eventos/<?= htmlspecialchars($evento['cartel']) ?>" alt="<?= htmlspecialchars($evento['nombre']) ?>">
                     <?php else: ?>
                         <span>Sin imagen</span>
                     <?php endif; ?>
                 </div>
 
-                <!-- Info -->
                 <span class="badge badge-<?= $evento['tipo_evento'] ?>"><?= htmlspecialchars($evento['tipo_evento']) ?></span>
                 <h1><?= htmlspecialchars($evento['nombre']) ?></h1>
                 <p class="evento-descripcion"><?= nl2br(htmlspecialchars($evento['descripcion'])) ?></p>
@@ -117,7 +101,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
                     </div>
                 </div>
 
-                <!-- Comentarios -->
                 <div class="comentarios">
                     <h3>Comentarios</h3>
 
@@ -147,13 +130,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
                         <p class="sin-resultados">Aún no hay comentarios.</p>
                     <?php endif; ?>
                 </div>
-
             </div>
 
-            <!-- Sidebar -->
             <div class="evento-sidebar">
-
-                <!-- Inscripción -->
                 <div class="sidebar-card">
                     <h4>Inscripción</h4>
                     <div class="barra-plazas">
@@ -164,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
 
                     <?php if (isset($_SESSION['usuario'])): ?>
                         <?php if ($inscrito): ?>
-                            <p class="alerta alerta-ok">Ya estás inscrito en este evento.</p>
+                            <p class="alerta alerta-ok">Ya estás inscrito.</p>
                             <a href="/revhub/desinscribirse.php?id=<?= $id ?>" class="btn-peligro btn-full">Cancelar inscripción</a>
                         <?php elseif ($inscritos >= $evento['max_participantes']): ?>
                             <p class="alerta alerta-error">Evento completo.</p>
@@ -176,13 +155,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
                     <?php endif; ?>
                 </div>
 
-                <!-- Organizador -->
                 <div class="sidebar-card">
                     <h4>Organizador</h4>
                     <p><?= htmlspecialchars($evento['org_nombre']) ?> (<?= htmlspecialchars($evento['username']) ?>)</p>
                 </div>
 
-                <!-- Asistentes -->
                 <div class="sidebar-card">
                     <h4>Asistentes (<?= $inscritos ?>)</h4>
                     <?php if (mysqli_num_rows($asistentes) > 0): ?>
@@ -198,7 +175,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
                         <p class="sin-resultados">Nadie inscrito aún.</p>
                     <?php endif; ?>
                 </div>
-
             </div>
         </div>
     </div>
