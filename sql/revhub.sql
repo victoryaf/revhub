@@ -33,7 +33,7 @@ CREATE TABLE vehiculos (
   modelo        VARCHAR(100) NOT NULL,
   anio          YEAR         NOT NULL,
   color         VARCHAR(50)  NOT NULL,
-  tipo_vehiculo VARCHAR(50)  NOT NULL,
+  tipo_vehiculo VARCHAR(100)  NOT NULL,
   matricula     VARCHAR(20)  NOT NULL UNIQUE,
   descripcion   TEXT,
   modificaciones TEXT,
@@ -54,6 +54,8 @@ CREATE TABLE eventos (
   ubicacion         VARCHAR(255) NOT NULL,
   max_participantes INT          NOT NULL DEFAULT 50,
   tipo_evento       VARCHAR(50)  NOT NULL,
+  tipos_admitidos   VARCHAR(255),
+  marcas_admitidas VARCHAR(500),
   cartel            VARCHAR(255),
   fecha_creacion    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
@@ -86,16 +88,30 @@ CREATE TABLE comentarios (
   FOREIGN KEY (id_evento)  REFERENCES eventos(id_evento)
 );
 
+CREATE TABLE mensajes (
+  id_mensaje    INT AUTO_INCREMENT PRIMARY KEY,
+  id_remitente  INT      NOT NULL,
+  id_destinatario INT    NOT NULL,
+  id_evento     INT      DEFAULT NULL,
+  asunto        VARCHAR(200) NOT NULL,
+  texto         TEXT     NOT NULL,
+  leido         TINYINT  NOT NULL DEFAULT 0,
+  fecha         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_remitente)    REFERENCES usuarios(id_usuario),
+  FOREIGN KEY (id_destinatario) REFERENCES usuarios(id_usuario),
+  FOREIGN KEY (id_evento)       REFERENCES eventos(id_evento) ON DELETE SET NULL
+);
+
 -- ============================================================
 -- DATOS DE PRUEBA
 -- ============================================================
 
 INSERT INTO usuarios (nombre, apellidos, username, email, contrasena, rol) VALUES
-('Victoria', 'Ausín Fernández',  'victoria', 'victoria@revhub.es', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin'),
-('Antonio',  'Martínez López',   'antonio',  'antonio@revhub.es',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'organizador'),
-('Lucía',    'Pérez García',     'lucia',    'lucia@revhub.es',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'usuario'),
-('Carlos',   'Rodríguez Vidal',  'carlos',   'carlos@revhub.es',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'usuario'),
-('Marta',    'Fernández Torres', 'marta',    'marta@revhub.es',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'usuario');
+('Victoria', 'Ausín Fernández',  'victoria', 'victoria@revhub.es', '$2y$10$dHt41aYNkx3QO94u.1lqH.JjFbw2KxN6bb30gAEvCL5udXmfY.Qz.', 'admin'),
+('Antonio',  'Martínez López',   'antonio',  'antonio@revhub.es',  '$2y$10$dHt41aYNkx3QO94u.1lqH.JjFbw2KxN6bb30gAEvCL5udXmfY.Qz.', 'organizador'),
+('Lucía',    'Pérez García',     'lucia',    'lucia@revhub.es',    '$2y$10$dHt41aYNkx3QO94u.1lqH.JjFbw2KxN6bb30gAEvCL5udXmfY.Qz.', 'usuario'),
+('Carlos',   'Rodríguez Vidal',  'carlos',   'carlos@revhub.es',   '$2y$10$dHt41aYNkx3QO94u.1lqH.JjFbw2KxN6bb30gAEvCL5udXmfY.Qz.', 'usuario'),
+('Marta',    'Fernández Torres', 'marta',    'marta@revhub.es',    '$2y$10$dHt41aYNkx3QO94u.1lqH.JjFbw2KxN6bb30gAEvCL5udXmfY.Qz.', 'usuario');
 
 INSERT INTO vehiculos (id_usuario, marca, modelo, anio, color, tipo_vehiculo, matricula, descripcion) VALUES
 (2, 'Ford',     'Mustang',   1969, 'Rojo',    'clasico',   'GH-3421-B', 'Mustang clásico restaurado, motor V8 original'),

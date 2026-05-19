@@ -1,7 +1,8 @@
-<?php include 'includes/cabecera.php'; ?>
 <?php
+include 'includes/cabecera.php';
 include 'php/conexion.php';
 
+/* --- Validar id --- */
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header('Location: /revhub/eventos.php');
     exit;
@@ -9,8 +10,9 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $id = (int)$_GET['id'];
 
+/* --- Obtener evento --- */
 $result = mysqli_query($conexion,
-    "SELECT e.*, u.username, u.nombre AS org_nombre
+    "SELECT e.*, u.username, u.nombre AS org_nombre, u.id_usuario AS org_id
      FROM eventos e
      JOIN usuarios u ON e.id_usuario = u.id_usuario
      WHERE e.id_evento = $id"
@@ -23,33 +25,76 @@ if (mysqli_num_rows($result) === 0) {
 
 $evento = mysqli_fetch_assoc($result);
 
+/* --- Inscritos --- */
 $inscritos = mysqli_fetch_assoc(mysqli_query($conexion,
     "SELECT COUNT(DISTINCT id_usuario) as total FROM inscripciones WHERE id_evento = $id"
 ))['total'];
 
-$comentarios = mysqli_query($conexion,
-    "SELECT c.*, u.username FROM comentarios c
-     JOIN usuarios u ON c.id_usuario = u.id_usuario
-     WHERE c.id_evento = $id ORDER BY c.fecha DESC"
-);
+/* --- ¿Es organizador del evento o admin? --- */
+$es_organizador = isset($_SESSION['usuario']) &&
+    ($evento['id_usuario'] == $_SESSION['usuario'] || $_SESSION['rol'] === 'admin');
 
-$asistentes = mysqli_query($conexion,
-    "SELECT DISTINCT u.username, v.marca, v.modelo
-     FROM inscripciones i
-     JOIN usuarios u ON i.id_usuario = u.id_usuario
-     JOIN vehiculos v ON i.id_vehiculo = v.id_vehiculo
-     WHERE i.id_evento = $id"
-);
-
+/* --- ¿Está inscrito el usuario? --- */
 $inscrito = false;
 if (isset($_SESSION['usuario'])) {
-    $uid = $_SESSION['usuario'];
-    $check = mysqli_query($conexion, "SELECT id_inscripcion FROM inscripciones WHERE id_usuario = $uid AND id_evento = $id");
+    $uid   = $_SESSION['usuario'];
+    $check = mysqli_query($conexion,
+        "SELECT id_inscripcion FROM inscripciones
+         WHERE id_usuario = $uid AND id_evento = $id"
+    );
     $inscrito = mysqli_num_rows($check) > 0;
 }
 
+/* --- Vehículos válidos del usuario para el modal --- */
+$vehiculos_usuario = null;
+if (isset($_SESSION['usuario']) && !$inscrito) {
+    $uid = $_SESSION['usuario'];
+
+    if (!empty($evento['tipos_admitidos'])) {
+        $tipos = explode(',', $evento['tipos_admitidos']);
+        $conds = [];
+        foreach ($tipos as $t) {
+            $t_e = mysqli_real_escape_string($conexion, trim($t));
+            $conds[] = "FIND_IN_SET('$t_e', tipo_vehiculo)";
+        }
+        $where_v = "id_usuario = $uid AND (" . implode(' OR ', $conds) . ")";
+    } else {
+        $where_v = "id_usuario = $uid";
+    }
+
+    if (!empty($evento['marcas_admitidas'])) {
+        $marcas = explode(',', $evento['marcas_admitidas']);
+        $marcas_conds = [];
+        foreach ($marcas as $m) {
+            $m_e = mysqli_real_escape_string($conexion, trim($m));
+            $marcas_conds[] = "marca = '$m_e'";
+        }
+        $where_v .= " AND (" . implode(' OR ', $marcas_conds) . ")";
+    }
+
+    $vehiculos_usuario = mysqli_query($conexion, "SELECT * FROM vehiculos WHERE $where_v");
+}
+
+/* --- Todos los vehículos del usuario para inscripción manual por org --- */
+$todos_vehiculos_usuario = null;
+if (isset($_SESSION['usuario'])) {
+    $uid = $_SESSION['usuario'];
+    $todos_vehiculos_usuario = mysqli_query($conexion,
+        "SELECT * FROM vehiculos WHERE id_usuario = $uid"
+    );
+}
+
+/* --- Tipos y marcas admitidas --- */
+$tipos_admitidos  = !empty($evento['tipos_admitidos'])  ? explode(',', $evento['tipos_admitidos'])  : [];
+$marcas_admitidas = !empty($evento['marcas_admitidas']) ? explode(',', $evento['marcas_admitidas']) : [];
+
+/* ============================================================
+   ACCIONES POST
+   ============================================================ */
+
+/* --- Comentar --- */
 $error_com = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['accion'] === 'comentar') {
     if (!isset($_SESSION['usuario'])) {
         $error_com = 'Debes iniciar sesión para comentar.';
     } elseif (empty(trim($_POST['comentario']))) {
@@ -57,11 +102,147 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
     } else {
         $uid   = $_SESSION['usuario'];
         $texto = mysqli_real_escape_string($conexion, trim($_POST['comentario']));
-        mysqli_query($conexion, "INSERT INTO comentarios (id_usuario, id_evento, texto) VALUES ($uid, $id, '$texto')");
+        mysqli_query($conexion,
+            "INSERT INTO comentarios (id_usuario, id_evento, texto) VALUES ($uid, $id, '$texto')"
+        );
         header("Location: /revhub/evento.php?id=$id");
         exit;
     }
 }
+
+/* --- Inscribirse --- */
+$error_ins = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['accion'] === 'inscribirse') {
+    if (!isset($_SESSION['usuario'])) {
+        $error_ins = 'Debes iniciar sesión.';
+    } elseif (empty($_POST['id_vehiculo']) || !is_numeric($_POST['id_vehiculo'])) {
+        $error_ins = 'Selecciona un vehículo.';
+    } else {
+        $uid         = $_SESSION['usuario'];
+        $id_vehiculo = (int)$_POST['id_vehiculo'];
+
+        $check_v = mysqli_query($conexion,
+            "SELECT id_vehiculo, marca, tipo_vehiculo FROM vehiculos
+             WHERE id_vehiculo = $id_vehiculo AND id_usuario = $uid"
+        );
+
+        if (mysqli_num_rows($check_v) === 0) {
+            $error_ins = 'Vehículo no válido.';
+        } else {
+            $datos_v = mysqli_fetch_assoc($check_v);
+            $valido  = true;
+
+            /* Comprobar tipos admitidos */
+            if (!empty($evento['tipos_admitidos'])) {
+                $tipos_ev  = array_map('trim', explode(',', strtolower($evento['tipos_admitidos'])));
+                $tipos_v   = array_map('trim', explode(',', strtolower($datos_v['tipo_vehiculo'])));
+                if (empty(array_intersect($tipos_v, $tipos_ev))) {
+                    $valido    = false;
+                    $error_ins = 'Tu vehículo no es del tipo admitido en este evento (' . implode(', ', $tipos_ev) . ').';
+                }
+            }
+
+            /* Comprobar marcas admitidas */
+            if ($valido && !empty($evento['marcas_admitidas'])) {
+                $marcas_ev = array_map('trim', explode(',', strtolower($evento['marcas_admitidas'])));
+                if (!in_array(strtolower(trim($datos_v['marca'])), $marcas_ev)) {
+                    $valido    = false;
+                    $error_ins = 'La marca de tu vehículo no está admitida en este evento (' . implode(', ', $marcas_ev) . ').';
+                }
+            }
+
+            if ($valido) {
+                mysqli_query($conexion,
+                    "INSERT INTO inscripciones (id_usuario, id_evento, id_vehiculo) VALUES ($uid, $id, $id_vehiculo)"
+                );
+                header("Location: /revhub/evento.php?id=$id");
+                exit;
+            }
+        }
+    }
+}
+
+/* --- Inscripción manual por organizador --- */
+$error_ins_manual = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['accion'] === 'inscribir_manual' && $es_organizador) {
+    $id_usuario_ins  = (int)$_POST['id_usuario_ins'];
+    $id_vehiculo_ins = (int)$_POST['id_vehiculo_ins'];
+
+    if (empty($id_usuario_ins) || empty($id_vehiculo_ins)) {
+        $error_ins_manual = 'Selecciona usuario y vehículo.';
+    } else {
+        /* Comprobar que no está ya inscrito */
+        $check_ya = mysqli_query($conexion,
+            "SELECT id_inscripcion FROM inscripciones WHERE id_usuario = $id_usuario_ins AND id_evento = $id"
+        );
+
+        if (mysqli_num_rows($check_ya) > 0) {
+            $error_ins_manual = 'Este usuario ya está inscrito.';
+        } else {
+            mysqli_query($conexion,
+                "INSERT INTO inscripciones (id_usuario, id_evento, id_vehiculo)
+                 VALUES ($id_usuario_ins, $id, $id_vehiculo_ins)"
+            );
+            header("Location: /revhub/evento.php?id=$id");
+            exit;
+        }
+    }
+}
+
+/* --- Enviar mensaje al organizador --- */
+$error_msg = '';
+$ok_msg    = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['accion'] === 'mensaje') {
+    if (!isset($_SESSION['usuario'])) {
+        $error_msg = 'Debes iniciar sesión.';
+    } elseif (empty(trim($_POST['texto_mensaje']))) {
+        $error_msg = 'El mensaje no puede estar vacío.';
+    } else {
+        $uid            = $_SESSION['usuario'];
+        $id_destinatario= (int)$evento['org_id'];
+        $asunto_e       = mysqli_real_escape_string($conexion, 'Consulta sobre: ' . $evento['nombre']);
+        $texto_e        = mysqli_real_escape_string($conexion, trim($_POST['texto_mensaje']));
+
+        mysqli_query($conexion,
+            "INSERT INTO mensajes (id_remitente, id_destinatario, id_evento, asunto, texto)
+             VALUES ($uid, $id_destinatario, $id, '$asunto_e', '$texto_e')"
+        );
+        $ok_msg = 'Mensaje enviado al organizador.';
+    }
+}
+
+/* --- Desinscribirse --- */
+if (isset($_GET['desinscribirse']) && isset($_SESSION['usuario'])) {
+    $uid = $_SESSION['usuario'];
+    mysqli_query($conexion, "DELETE FROM inscripciones WHERE id_usuario = $uid AND id_evento = $id");
+    header("Location: /revhub/evento.php?id=$id");
+    exit;
+}
+
+/* --- Expulsar asistente --- */
+if (isset($_GET['expulsar']) && is_numeric($_GET['expulsar']) && $es_organizador) {
+    $id_exp = (int)$_GET['expulsar'];
+    mysqli_query($conexion, "DELETE FROM inscripciones WHERE id_usuario = $id_exp AND id_evento = $id");
+    header("Location: /revhub/evento.php?id=$id");
+    exit;
+}
+
+/* --- Borrar comentario --- */
+if (isset($_GET['borrar_com']) && is_numeric($_GET['borrar_com']) && isset($_SESSION['usuario'])) {
+    $id_com = (int)$_GET['borrar_com'];
+    $uid    = $_SESSION['usuario'];
+    $check_com = mysqli_query($conexion,
+        "SELECT id_comentario FROM comentarios
+         WHERE id_comentario = $id_com AND (id_usuario = $uid OR $es_organizador)"
+    );
+    if (mysqli_num_rows($check_com) > 0) {
+        mysqli_query($conexion, "DELETE FROM comentarios WHERE id_comentario = $id_com");
+    }
+    header("Location: /revhub/evento.php?id=$id");
+    exit;
+}
+
+$pct = $evento['max_participantes'] > 0 ? round($inscritos / $evento['max_participantes'] * 100) : 0;
 ?>
 
 <main>
@@ -69,16 +250,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
         <a href="/revhub/eventos.php" class="volver">&larr; Volver a eventos</a>
 
         <div class="evento-layout">
+
+            <!-- Contenido principal -->
             <div class="evento-main">
                 <div class="evento-imagen">
                     <?php if ($evento['cartel']): ?>
-                        <img src="/revhub/img/eventos/<?= htmlspecialchars($evento['cartel']) ?>" alt="<?= htmlspecialchars($evento['nombre']) ?>">
+                        <img src="/revhub/img/eventos/<?= htmlspecialchars($evento['cartel']) ?>"
+                             alt="<?= htmlspecialchars($evento['nombre']) ?>">
                     <?php else: ?>
                         <span>Sin imagen</span>
                     <?php endif; ?>
                 </div>
 
-                <span class="badge badge-<?= $evento['tipo_evento'] ?>"><?= htmlspecialchars($evento['tipo_evento']) ?></span>
+                <div class="evento-badges">
+                    <span class="badge badge-<?= $evento['tipo_evento'] ?>"><?= htmlspecialchars($evento['tipo_evento']) ?></span>
+                    <?php foreach ($tipos_admitidos as $ta): ?>
+                        <span class="badge badge-tipo-admitido"><?= htmlspecialchars(trim($ta)) ?></span>
+                    <?php endforeach; ?>
+                    <?php if (!empty($marcas_admitidas)): ?>
+                        <span class="badge-restriccion">
+                            <i class="fa-solid fa-filter"></i>
+                            <?= htmlspecialchars(implode(', ', $marcas_admitidas)) ?>
+                        </span>
+                    <?php endif; ?>
+                </div>
+
                 <h1><?= htmlspecialchars($evento['nombre']) ?></h1>
                 <p class="evento-descripcion"><?= nl2br(htmlspecialchars($evento['descripcion'])) ?></p>
 
@@ -101,27 +297,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
                     </div>
                 </div>
 
+                <!-- Botones organizador -->
+                <?php if ($es_organizador): ?>
+                <div class="acciones-organizador">
+                    <a href="/revhub/editar_evento.php?id=<?= $id ?>" class="btn-outline">
+                        <i class="fa-solid fa-pen"></i> Editar evento
+                    </a>
+                    <a href="/revhub/admin.php?eliminar_evento=<?= $id ?>"
+                       class="btn-peligro"
+                       onclick="return confirm('¿Eliminar este evento?')">
+                       <i class="fa-solid fa-trash"></i> Eliminar
+                    </a>
+                </div>
+                <?php endif; ?>
+
+                <!-- Comentarios -->
                 <div class="comentarios">
                     <h3>Comentarios</h3>
+
+                    <?php if ($ok_msg): ?>
+                        <div class="alerta alerta-ok"><?= $ok_msg ?></div>
+                    <?php endif; ?>
 
                     <?php if (isset($_SESSION['usuario'])): ?>
                         <?php if ($error_com): ?>
                             <div class="alerta alerta-error"><?= $error_com ?></div>
                         <?php endif; ?>
                         <form method="POST" action="" class="form-comentario">
+                            <input type="hidden" name="accion" value="comentar">
                             <textarea name="comentario" placeholder="Escribe un comentario..." rows="3"></textarea>
                             <button type="submit" class="btn">Publicar</button>
                         </form>
                     <?php else: ?>
-                        <p class="aviso-login"><a href="/revhub/login.php">Inicia sesión</a> para comentar.</p>
+                        <p class="aviso-login">
+                            <button class="btn-texto" onclick="abrirModal('modal-login')">Inicia sesión</button>
+                            para comentar.
+                        </p>
                     <?php endif; ?>
 
-                    <?php if (mysqli_num_rows($comentarios) > 0): ?>
-                        <?php while ($com = mysqli_fetch_assoc($comentarios)): ?>
+                    <?php
+                    $comentarios2 = mysqli_query($conexion,
+                        "SELECT c.*, u.username FROM comentarios c
+                         JOIN usuarios u ON c.id_usuario = u.id_usuario
+                         WHERE c.id_evento = $id ORDER BY c.fecha DESC"
+                    );
+                    ?>
+                    <?php if (mysqli_num_rows($comentarios2) > 0): ?>
+                        <?php while ($com = mysqli_fetch_assoc($comentarios2)): ?>
                         <div class="comentario">
                             <div class="comentario-header">
                                 <strong><?= htmlspecialchars($com['username']) ?></strong>
-                                <span><?= date('d/m/Y H:i', strtotime($com['fecha'])) ?></span>
+                                <div class="comentario-acciones">
+                                    <span><?= date('d/m/Y H:i', strtotime($com['fecha'])) ?></span>
+                                    <?php if (isset($_SESSION['usuario']) &&
+                                        ($com['id_usuario'] == $_SESSION['usuario'] || $es_organizador)): ?>
+                                        <a href="/revhub/evento.php?id=<?= $id ?>&borrar_com=<?= $com['id_comentario'] ?>"
+                                           class="btn-borrar-com"
+                                           onclick="return confirm('¿Eliminar este comentario?')">
+                                           <i class="fa-solid fa-xmark"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                             <p><?= nl2br(htmlspecialchars($com['texto'])) ?></p>
                         </div>
@@ -132,42 +368,104 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
                 </div>
             </div>
 
+            <!-- Sidebar -->
             <div class="evento-sidebar">
+
+                <!-- Inscripción -->
                 <div class="sidebar-card">
                     <h4>Inscripción</h4>
                     <div class="barra-plazas">
-                        <?php $pct = $evento['max_participantes'] > 0 ? round($inscritos / $evento['max_participantes'] * 100) : 0; ?>
                         <div class="barra-fill" style="width:<?= $pct ?>%"></div>
                     </div>
                     <p class="plazas-texto"><?= $inscritos ?> de <?= $evento['max_participantes'] ?> plazas ocupadas</p>
 
+                    <?php if (!empty($tipos_admitidos) || !empty($marcas_admitidas)): ?>
+                        <div class="restricciones-resumen">
+                            <?php if (!empty($tipos_admitidos)): ?>
+                                <p class="tipos-admitidos-label">Tipos: <?= implode(', ', $tipos_admitidos) ?></p>
+                            <?php endif; ?>
+                            <?php if (!empty($marcas_admitidas)): ?>
+                                <p class="tipos-admitidos-label">Marcas: <?= implode(', ', $marcas_admitidas) ?></p>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+
                     <?php if (isset($_SESSION['usuario'])): ?>
                         <?php if ($inscrito): ?>
                             <p class="alerta alerta-ok">Ya estás inscrito.</p>
-                            <a href="/revhub/desinscribirse.php?id=<?= $id ?>" class="btn-peligro btn-full">Cancelar inscripción</a>
+                            <a href="/revhub/evento.php?id=<?= $id ?>&desinscribirse=1"
+                               class="btn-peligro btn-full"
+                               onclick="return confirm('¿Cancelar inscripción?')">
+                               Cancelar inscripción
+                            </a>
                         <?php elseif ($inscritos >= $evento['max_participantes']): ?>
                             <p class="alerta alerta-error">Evento completo.</p>
                         <?php else: ?>
-                            <a href="/revhub/inscribirse.php?id=<?= $id ?>" class="btn btn-full">Apuntarse</a>
+                            <button class="btn btn-full" onclick="abrirModal('modal-inscripcion')">
+                                Apuntarse
+                            </button>
+                            <?php if (!empty($tipos_admitidos) || !empty($marcas_admitidas)): ?>
+                                <button class="btn-outline btn-full" style="margin-top:8px;"
+                                        onclick="abrirModal('modal-mensaje')">
+                                    <i class="fa-regular fa-envelope"></i> Mi coche no cumple los requisitos
+                                </button>
+                            <?php endif; ?>
                         <?php endif; ?>
                     <?php else: ?>
-                        <a href="/revhub/login.php" class="btn btn-full">Inicia sesión para inscribirte</a>
+                        <button class="btn btn-full" onclick="abrirModal('modal-login')">
+                            Inicia sesión para inscribirte
+                        </button>
                     <?php endif; ?>
                 </div>
 
+                <!-- Organizador -->
                 <div class="sidebar-card">
                     <h4>Organizador</h4>
-                    <p><?= htmlspecialchars($evento['org_nombre']) ?> (<?= htmlspecialchars($evento['username']) ?>)</p>
+                    <p><?= htmlspecialchars($evento['org_nombre']) ?> (@<?= htmlspecialchars($evento['username']) ?>)</p>
+                    <?php if (isset($_SESSION['usuario']) && $_SESSION['usuario'] != $evento['org_id']): ?>
+                        <button class="btn-outline btn-full" style="margin-top:10px;"
+                                onclick="abrirModal('modal-mensaje')">
+                            <i class="fa-regular fa-envelope"></i> Contactar
+                        </button>
+                    <?php endif; ?>
                 </div>
 
+                <!-- Asistentes -->
                 <div class="sidebar-card">
                     <h4>Asistentes (<?= $inscritos ?>)</h4>
-                    <?php if (mysqli_num_rows($asistentes) > 0): ?>
+
+                    <!-- Inscripción manual por organizador -->
+                    <?php if ($es_organizador): ?>
+                        <button class="btn-accion btn-full" style="margin-bottom:10px;"
+                                onclick="abrirModal('modal-ins-manual')">
+                            <i class="fa-solid fa-user-plus"></i> Inscribir manualmente
+                        </button>
+                    <?php endif; ?>
+
+                    <?php
+                    $asistentes2 = mysqli_query($conexion,
+                        "SELECT DISTINCT u.id_usuario, u.username, v.marca, v.modelo, v.tipo_vehiculo
+                         FROM inscripciones i
+                         JOIN usuarios u ON i.id_usuario = u.id_usuario
+                         JOIN vehiculos v ON i.id_vehiculo = v.id_vehiculo
+                         WHERE i.id_evento = $id"
+                    );
+                    ?>
+                    <?php if (mysqli_num_rows($asistentes2) > 0): ?>
                         <ul class="lista-asistentes">
-                            <?php while ($a = mysqli_fetch_assoc($asistentes)): ?>
+                            <?php while ($a = mysqli_fetch_assoc($asistentes2)): ?>
                             <li>
-                                <strong><?= htmlspecialchars($a['username']) ?></strong>
-                                — <?= htmlspecialchars($a['marca']) ?> <?= htmlspecialchars($a['modelo']) ?>
+                                <div>
+                                    <strong><?= htmlspecialchars($a['username']) ?></strong>
+                                    <span><?= htmlspecialchars($a['marca']) ?> <?= htmlspecialchars($a['modelo']) ?></span>
+                                </div>
+                                <?php if ($es_organizador && $a['id_usuario'] != $_SESSION['usuario']): ?>
+                                    <a href="/revhub/evento.php?id=<?= $id ?>&expulsar=<?= $a['id_usuario'] ?>"
+                                       class="btn-peligro btn-sm"
+                                       onclick="return confirm('¿Expulsar a <?= htmlspecialchars($a['username']) ?>?')">
+                                       Expulsar
+                                    </a>
+                                <?php endif; ?>
                             </li>
                             <?php endwhile; ?>
                         </ul>
@@ -175,9 +473,168 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comentario'])) {
                         <p class="sin-resultados">Nadie inscrito aún.</p>
                     <?php endif; ?>
                 </div>
+
             </div>
         </div>
     </div>
 </main>
+
+<!-- ===== MODAL INSCRIPCIÓN ===== -->
+<?php if (isset($_SESSION['usuario']) && !$inscrito && $inscritos < $evento['max_participantes']): ?>
+<div class="modal-overlay" id="modal-inscripcion" <?= $error_ins ? 'style="display:flex;"' : '' ?>>
+    <div class="modal">
+        <button class="modal-cerrar" onclick="cerrarModal('modal-inscripcion')">&times;</button>
+        <h2>Apuntarse al evento</h2>
+        <p class="subtitulo"><?= htmlspecialchars($evento['nombre']) ?></p>
+
+        <?php if ($error_ins): ?>
+            <div class="alerta alerta-error"><?= $error_ins ?></div>
+        <?php endif; ?>
+
+        <?php if ($vehiculos_usuario && mysqli_num_rows($vehiculos_usuario) > 0): ?>
+            <form method="POST" action="">
+                <input type="hidden" name="accion" value="inscribirse">
+                <div class="form-group">
+                    <label for="id_vehiculo">Vehículo con el que asistirás</label>
+                    <?php if (!empty($tipos_admitidos) || !empty($marcas_admitidas)): ?>
+                        <small class="form-ayuda">
+                            <?php if (!empty($tipos_admitidos)): ?>Tipos admitidos: <?= implode(', ', $tipos_admitidos) ?><?php endif; ?>
+                            <?php if (!empty($marcas_admitidas)): ?> · Marcas admitidas: <?= implode(', ', $marcas_admitidas) ?><?php endif; ?>
+                        </small>
+                    <?php endif; ?>
+                    <select id="id_vehiculo" name="id_vehiculo">
+                        <option value="">-- Elige un vehículo --</option>
+                        <?php while ($v = mysqli_fetch_assoc($vehiculos_usuario)): ?>
+                            <option value="<?= $v['id_vehiculo'] ?>">
+                                <?= htmlspecialchars($v['marca']) ?> <?= htmlspecialchars($v['modelo']) ?>
+                                (<?= htmlspecialchars($v['matricula']) ?>) — <?= htmlspecialchars($v['tipo_vehiculo']) ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-full">Confirmar inscripción</button>
+            </form>
+        <?php else: ?>
+            <div class="alerta alerta-info">
+                <?php if (!empty($tipos_admitidos) || !empty($marcas_admitidas)): ?>
+                    Ninguno de tus vehículos cumple los requisitos de este evento.
+                    <?php if (!empty($tipos_admitidos)): ?>Tipos admitidos: <?= implode(', ', $tipos_admitidos) ?>.<?php endif; ?>
+                    <?php if (!empty($marcas_admitidas)): ?>Marcas admitidas: <?= implode(', ', $marcas_admitidas) ?>.<?php endif; ?>
+                    <a href="/revhub/vehiculos.php">Gestiona tus vehículos</a> o contacta con el organizador.
+                <?php else: ?>
+                    No tienes vehículos registrados. <a href="/revhub/vehiculos.php">Añade uno aquí</a>.
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- ===== MODAL MENSAJE AL ORGANIZADOR ===== -->
+<?php if (isset($_SESSION['usuario']) && $_SESSION['usuario'] != $evento['org_id']): ?>
+<div class="modal-overlay" id="modal-mensaje" <?= $error_msg ? 'style="display:flex;"' : '' ?>>
+    <div class="modal">
+        <button class="modal-cerrar" onclick="cerrarModal('modal-mensaje')">&times;</button>
+        <h2>Contactar con el organizador</h2>
+        <p class="subtitulo">
+            Mensaje privado a <?= htmlspecialchars($evento['username']) ?>
+            sobre el evento "<?= htmlspecialchars($evento['nombre']) ?>"
+        </p>
+
+        <?php if ($error_msg): ?>
+            <div class="alerta alerta-error"><?= $error_msg ?></div>
+        <?php endif; ?>
+
+        <form method="POST" action="">
+            <input type="hidden" name="accion" value="mensaje">
+            <div class="form-group">
+                <label for="texto_mensaje">Mensaje</label>
+                <textarea id="texto_mensaje" name="texto_mensaje" rows="5"
+                          placeholder="Explica tu situación al organizador..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-full">Enviar mensaje</button>
+        </form>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- ===== MODAL INSCRIPCIÓN MANUAL (organizador) ===== -->
+<?php if ($es_organizador): ?>
+<div class="modal-overlay" id="modal-ins-manual" <?= $error_ins_manual ? 'style="display:flex;"' : '' ?>>
+    <div class="modal modal-grande">
+        <button class="modal-cerrar" onclick="cerrarModal('modal-ins-manual')">&times;</button>
+        <h2>Inscribir manualmente</h2>
+        <p class="subtitulo">Inscribe a un usuario saltándose las restricciones del evento</p>
+
+        <?php if ($error_ins_manual): ?>
+            <div class="alerta alerta-error"><?= $error_ins_manual ?></div>
+        <?php endif; ?>
+
+        <form method="POST" action="" id="form-ins-manual">
+            <input type="hidden" name="accion" value="inscribir_manual">
+
+            <div class="form-group">
+                <label for="id_usuario_ins">Usuario</label>
+                <select id="id_usuario_ins" name="id_usuario_ins" onchange="cargarVehiculos(this.value)">
+                    <option value="">-- Selecciona un usuario --</option>
+                    <?php
+                    $usuarios_todos = mysqli_query($conexion,
+                        "SELECT id_usuario, username FROM usuarios
+                         WHERE rol != 'bloqueado' ORDER BY username ASC"
+                    );
+                    while ($u = mysqli_fetch_assoc($usuarios_todos)):
+                        /* No mostrar los ya inscritos */
+                        $ya = mysqli_fetch_assoc(mysqli_query($conexion,
+                            "SELECT id_inscripcion FROM inscripciones
+                             WHERE id_usuario = {$u['id_usuario']} AND id_evento = $id"
+                        ));
+                        if ($ya) continue;
+                    ?>
+                        <option value="<?= $u['id_usuario'] ?>">
+                            <?= htmlspecialchars($u['username']) ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+
+            <div class="form-group" id="grupo-vehiculo" style="display:none;">
+                <label for="id_vehiculo_ins">Vehículo</label>
+                <select id="id_vehiculo_ins" name="id_vehiculo_ins">
+                    <option value="">-- Primero selecciona un usuario --</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-full">Inscribir</button>
+        </form>
+    </div>
+</div>
+
+<script>
+/* Cargar vehículos del usuario seleccionado por AJAX simple */
+function cargarVehiculos(idUsuario) {
+    var grupo = document.getElementById('grupo-vehiculo');
+    var select = document.getElementById('id_vehiculo_ins');
+
+    if (!idUsuario) {
+        grupo.style.display = 'none';
+        return;
+    }
+
+    /* Hacemos una petición a un endpoint sencillo */
+    fetch('/revhub/php/get_vehiculos.php?id_usuario=' + idUsuario)
+        .then(function(r) { return r.json(); })
+        .then(function(vehiculos) {
+            select.innerHTML = '<option value="">-- Elige un vehículo --</option>';
+            vehiculos.forEach(function(v) {
+                var opt = document.createElement('option');
+                opt.value = v.id_vehiculo;
+                opt.textContent = v.marca + ' ' + v.modelo + ' (' + v.matricula + ')';
+                select.appendChild(opt);
+            });
+            grupo.style.display = 'block';
+        });
+}
+</script>
+<?php endif; ?>
 
 <?php include 'includes/pie.php'; ?>

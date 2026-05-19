@@ -11,10 +11,9 @@
      Blanco      #FFFFFF — tarjetas y formularios
      Verde       #27AE60 — estado activo
      Ambar       #B7770D — estado pendiente
-     Rojo claro  #F9EBEA — botón acción en tarjeta
+     Rojo claro  #F9EBEA — boton accion en tarjeta
    ============================================================ */
 
-/* === FUENTE === */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
 
 /* === RESET === */
@@ -66,7 +65,6 @@ header {
     justify-content: space-between;
 }
 
-/* Logo */
 .logo {
     display: flex;
     align-items: center;
@@ -90,7 +88,6 @@ header {
     font-weight: 500;
 }
 
-/* Navegación */
 nav {
     display: flex;
     gap: 20px;
@@ -107,7 +104,6 @@ nav a:hover {
     color: #fff;
 }
 
-/* Icono con texto en nav */
 .nav-icono {
     display: flex;
     align-items: center;
@@ -120,8 +116,22 @@ nav a:hover {
     color: #fff;
 }
 
+.btn-nav {
+    background: none;
+    border: none;
+    color: #8E8E93;
+    font-size: 14px;
+    font-family: 'Inter', Arial, sans-serif;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-nav:hover {
+    color: #fff;
+}
+
 /* ============================================================
-   PIE DE PÁGINA
+   PIE DE PAGINA
    ============================================================ */
 footer {
     background: #1C1C1E;
@@ -161,10 +171,6 @@ footer {
 
 /* ============================================================
    BOTONES
-   Primario:      fondo rojo motor, texto blanco, esquinas redondeadas
-   Secundario:    fondo transparente, borde, texto oscuro
-   Acción tarjeta: fondo rojo claro, texto rojo motor
-   Destructivo:   texto rojo oscuro, fondo gris claro
    ============================================================ */
 .btn {
     display: inline-block;
@@ -241,6 +247,17 @@ footer {
     background: #FDEDEC;
 }
 
+.btn-texto {
+    background: none;
+    border: none;
+    color: #C0392B;
+    font-size: 13px;
+    font-family: 'Inter', Arial, sans-serif;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+}
+
 /* ============================================================
    CONTENEDOR
    ============================================================ */
@@ -300,7 +317,7 @@ footer {
 }
 
 /* ============================================================
-   ENCABEZADO DE SECCIÓN
+   ENCABEZADO DE SECCION
    ============================================================ */
 .seccion-header {
     display: flex;
@@ -394,7 +411,7 @@ footer {
 }
 
 /* ============================================================
-   BADGES TIPO EVENTO
+   BADGES
    ============================================================ */
 .badge {
     display: inline-block;
@@ -416,9 +433,9 @@ footer {
 /* ============================================================
    ESTADOS
    ============================================================ */
-.estado-activo   { color: #27AE60; font-weight: 500; }
-.estado-pendiente{ color: #B7770D; font-weight: 500; }
-.estado-bloqueado{ color: #922B21; font-weight: 500; }
+.estado-activo    { color: #27AE60; font-weight: 500; }
+.estado-pendiente { color: #B7770D; font-weight: 500; }
+.estado-bloqueado { color: #922B21; font-weight: 500; }
 
 /* ============================================================
    FORMULARIOS
@@ -495,6 +512,13 @@ footer {
 
 .form-pie a {
     color: #C0392B;
+}
+
+.form-ayuda {
+    display: block;
+    font-size: 11px;
+    color: #8E8E93;
+    margin-top: 4px;
 }
 
 /* ============================================================
@@ -739,7 +763,6 @@ footer {
     color: #636366;
 }
 
-/* Barra de plazas */
 .barra-plazas {
     height: 5px;
     background: #E5E5EA;
@@ -760,7 +783,6 @@ footer {
     margin-bottom: 12px;
 }
 
-/* Lista asistentes */
 .lista-asistentes {
     list-style: none;
     display: flex;
@@ -779,13 +801,1417 @@ footer {
 }
 
 /* ============================================================
+   VEHICULOS
+   ============================================================ */
+.pagina-titulo {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+.vehiculos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.tarjeta-vehiculo {
+    background: #fff;
+    border: 1px solid #E5E5EA;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.vehiculo-cabecera {
+    width: 100%;
+    height: 180px;
+    background: #2C2C2E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.vehiculo-cabecera img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.vehiculo-cabecera i {
+    color: #636366;
+    font-size: 52px;
+}
+
+.vehiculo-cuerpo {
+    padding: 16px;
+}
+
+.vehiculo-cuerpo h3 {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.vehiculo-datos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.vehiculo-dato {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.vehiculo-dato span:first-child {
+    font-size: 10px;
+    font-weight: 500;
+    color: #8E8E93;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.vehiculo-dato span:last-child {
+    font-size: 13px;
+    color: #1C1C1E;
+    font-weight: 500;
+}
+
+.vehiculo-matricula {
+    font-size: 12px;
+    font-weight: 500;
+    color: #1C1C1E;
+    background: #F5F5F0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid #E5E5EA;
+    letter-spacing: 0.05em;
+}
+
+.vehiculo-descripcion {
+    font-size: 13px;
+    color: #636366;
+    line-height: 1.6;
+    padding-top: 12px;
+    border-top: 1px solid #F2F2F7;
+    margin-top: 8px;
+}
+
+.vehiculo-pie {
+    padding: 10px 16px;
+    border-top: 1px solid #E5E5EA;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* ============================================================
+   MODALES
+   ============================================================ */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal {
+    background: #fff;
+    border-radius: 8px;
+    padding: 28px;
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-grande {
+    max-width: 620px;
+}
+
+.modal h2 {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.modal-cerrar {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #8E8E93;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-cerrar:hover {
+    color: #1C1C1E;
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 768px) {
     .eventos-grid      { grid-template-columns: 1fr; }
+    .vehiculos-grid    { grid-template-columns: 1fr; }
     .form-2col         { grid-template-columns: 1fr; }
     .evento-layout     { grid-template-columns: 1fr; }
     .evento-meta-grid  { grid-template-columns: 1fr 1fr; }
     .pie-inner         { flex-direction: column; align-items: flex-start; }
     nav a:not(.btn)    { display: none; }
+}
+
+/* ============================================================
+   PERFIL
+   ============================================================ */
+.perfil-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.perfil-sidebar .sidebar-card {
+    text-align: center;
+}
+
+.perfil-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #2C2C2E;
+    margin: 0 auto 14px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.perfil-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.perfil-avatar i {
+    color: #636366;
+    font-size: 36px;
+}
+
+.perfil-nombre {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.perfil-username {
+    font-size: 13px;
+    color: #8E8E93;
+    margin-bottom: 8px;
+}
+
+.perfil-desc {
+    font-size: 13px;
+    color: #636366;
+    margin-top: 10px;
+    line-height: 1.6;
+    text-align: left;
+}
+
+.perfil-stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #E5E5EA;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.stat span {
+    font-size: 18px;
+    font-weight: 500;
+    color: #1C1C1E;
+}
+
+.stat small {
+    font-size: 11px;
+    color: #8E8E93;
+}
+
+.perfil-main {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.perfil-main .sidebar-card h3 {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #E5E5EA;
+}
+
+/* Badge rol */
+.badge-rol {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: inline-block;
+    margin-bottom: 4px;
+}
+
+.badge-usuario      { background: #EBF5FB; color: #1A5276; }
+.badge-organizador  { background: #EAFAF1; color: #1E8449; }
+.badge-admin        { background: #FDEDEC; color: #922B21; }
+
+/* Lista vehículos en perfil */
+.lista-vehiculos {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.vehiculo-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.vehiculo-item-img {
+    width: 56px;
+    height: 42px;
+    border-radius: 4px;
+    background: #2C2C2E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.vehiculo-item-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.vehiculo-item-img i {
+    color: #636366;
+    font-size: 18px;
+}
+
+.vehiculo-item strong {
+    font-size: 13px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.vehiculo-item p {
+    font-size: 12px;
+    color: #8E8E93;
+}
+
+/* Lista historial */
+.lista-historial {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.lista-historial li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #F2F2F7;
+}
+
+.lista-historial li:last-child {
+    border-bottom: none;
+}
+
+.lista-historial strong {
+    font-size: 13px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.lista-historial p {
+    font-size: 12px;
+    color: #8E8E93;
+}
+
+/* Formulario ancho */
+.formulario-ancho {
+    max-width: 700px;
+}
+
+/* ============================================================
+   ADMIN
+   ============================================================ */
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: #fff;
+    border: 1px solid #E5E5EA;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+.stat-card span {
+    display: block;
+    font-size: 28px;
+    font-weight: 500;
+    color: #C0392B;
+    margin-bottom: 4px;
+}
+
+.stat-card small {
+    font-size: 12px;
+    color: #8E8E93;
+}
+
+.tabla-scroll {
+    overflow-x: auto;
+}
+
+.tabla-admin {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.tabla-admin th {
+    text-align: left;
+    padding: 8px 12px;
+    background: #F5F5F0;
+    font-size: 11px;
+    font-weight: 500;
+    color: #8E8E93;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #E5E5EA;
+}
+
+.tabla-admin td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #F2F2F7;
+    color: #1C1C1E;
+    vertical-align: middle;
+}
+
+.tabla-admin tr:last-child td {
+    border-bottom: none;
+}
+
+.btn-sm {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.acciones-td {
+    display: flex;
+    gap: 6px;
+}
+
+.td-texto {
+    max-width: 200px;
+    color: #636366;
+}
+
+.form-rol {
+    display: inline;
+}
+
+.select-rol {
+    padding: 4px 8px;
+    border: 1px solid #E5E5EA;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'Inter', Arial, sans-serif;
+    color: #1C1C1E;
+    background: #fff;
+    cursor: pointer;
+}
+
+.texto-gris {
+    font-size: 12px;
+    color: #8E8E93;
+}
+
+.sidebar-card h3 {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #E5E5EA;
+}
+
+/* Responsive perfil y admin */
+@media (max-width: 768px) {
+    .perfil-layout  { grid-template-columns: 1fr; }
+    .admin-stats    { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ============================================================
+   NUEVOS ESTILOS — Añadir al final de style.css
+   ============================================================ */
+
+/* Checkboxes grupo */
+.checkboxes-grupo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #1C1C1E;
+    cursor: pointer;
+    padding: 6px 12px;
+    border: 1px solid #E5E5EA;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    accent-color: #C0392B;
+}
+
+.checkbox-label:has(input:checked) {
+    border-color: #C0392B;
+    background: #F9EBEA;
+    color: #922B21;
+}
+
+/* Badge tipo admitido */
+.badge-tipo-admitido {
+    background: #F5F5F0;
+    color: #636366;
+    border: 1px solid #E5E5EA;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: inline-block;
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+
+/* Tipos admitidos en sidebar */
+.tipos-admitidos-label {
+    font-size: 11px;
+    color: #8E8E93;
+    margin-bottom: 4px;
+    margin-top: 8px;
+}
+
+.tipos-admitidos {
+    margin-bottom: 12px;
+}
+
+/* Acciones organizador en detalle evento */
+.acciones-organizador {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+/* Botón borrar comentario */
+.comentario-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-borrar-com {
+    color: #C7C7CC;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.btn-borrar-com:hover {
+    color: #C0392B;
+}
+
+/* Lista asistentes con expulsar */
+.lista-asistentes li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lista-asistentes li div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.lista-asistentes li span {
+    font-size: 12px;
+    color: #8E8E93;
+}
+
+/* Cartel preview en editar */
+.cartel-preview {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border: 1px solid #E5E5EA;
+}
+
+/* ============================================================
+   NUEVOS ESTILOS — Añadir al final de style.css
+   ============================================================ */
+
+/* Checkboxes grupo */
+.checkboxes-grupo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #1C1C1E;
+    cursor: pointer;
+    padding: 6px 12px;
+    border: 1px solid #E5E5EA;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    accent-color: #C0392B;
+}
+
+.checkbox-label:has(input:checked) {
+    border-color: #C0392B;
+    background: #F9EBEA;
+    color: #922B21;
+}
+
+/* Badge tipo admitido */
+.badge-tipo-admitido {
+    background: #F5F5F0;
+    color: #636366;
+    border: 1px solid #E5E5EA;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: inline-block;
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+
+/* Tipos admitidos en sidebar */
+.tipos-admitidos-label {
+    font-size: 11px;
+    color: #8E8E93;
+    margin-bottom: 4px;
+    margin-top: 8px;
+}
+
+.tipos-admitidos {
+    margin-bottom: 12px;
+}
+
+/* Acciones organizador en detalle evento */
+.acciones-organizador {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+/* Botón borrar comentario */
+.comentario-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-borrar-com {
+    color: #C7C7CC;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.btn-borrar-com:hover {
+    color: #C0392B;
+}
+
+/* Lista asistentes con expulsar */
+.lista-asistentes li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lista-asistentes li div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.lista-asistentes li span {
+    font-size: 12px;
+    color: #8E8E93;
+}
+
+/* Cartel preview en editar */
+.cartel-preview {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border: 1px solid #E5E5EA;
+}
+
+/* Chips filtro mis coches */
+.filtros-chips {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #E5E5EA;
+    background: #fff;
+    color: #8E8E93;
+    cursor: pointer;
+}
+
+.chip:hover {
+    border-color: #C0392B;
+    color: #C0392B;
+}
+
+.chip-activo {
+    background: #C0392B;
+    border-color: #C0392B;
+    color: #fff;
+}
+
+.chip-activo:hover {
+    background: #922B21;
+    border-color: #922B21;
+    color: #fff;
+}
+
+/* Badge restricción en tarjeta */
+.badge-restriccion {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: #B7770D;
+    background: #FEF9E7;
+    border: 1px solid #FAD7A0;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-bottom: 6px;
+    margin-left: 4px;
+}
+
+/* Filtros admitidos en formulario */
+.filtros-admitidos {
+    background: #F5F5F0;
+    border: 1px solid #E5E5EA;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.filtros-admitidos h3 {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge-opcional {
+    font-size: 10px;
+    font-weight: 500;
+    background: #EBF5FB;
+    color: #1A5276;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   NUEVOS ESTILOS — Añadir al final de style.css
+   ============================================================ */
+
+/* Checkboxes grupo */
+.checkboxes-grupo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #1C1C1E;
+    cursor: pointer;
+    padding: 6px 12px;
+    border: 1px solid #E5E5EA;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    accent-color: #C0392B;
+}
+
+.checkbox-label:has(input:checked) {
+    border-color: #C0392B;
+    background: #F9EBEA;
+    color: #922B21;
+}
+
+/* Badge tipo admitido */
+.badge-tipo-admitido {
+    background: #F5F5F0;
+    color: #636366;
+    border: 1px solid #E5E5EA;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: inline-block;
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+
+/* Tipos admitidos en sidebar */
+.tipos-admitidos-label {
+    font-size: 11px;
+    color: #8E8E93;
+    margin-bottom: 4px;
+    margin-top: 8px;
+}
+
+.tipos-admitidos {
+    margin-bottom: 12px;
+}
+
+/* Acciones organizador en detalle evento */
+.acciones-organizador {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+/* Botón borrar comentario */
+.comentario-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-borrar-com {
+    color: #C7C7CC;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.btn-borrar-com:hover {
+    color: #C0392B;
+}
+
+/* Lista asistentes con expulsar */
+.lista-asistentes li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lista-asistentes li div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.lista-asistentes li span {
+    font-size: 12px;
+    color: #8E8E93;
+}
+
+/* Cartel preview en editar */
+.cartel-preview {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border: 1px solid #E5E5EA;
+}
+
+/* Chips filtro mis coches */
+.filtros-chips {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #E5E5EA;
+    background: #fff;
+    color: #8E8E93;
+    cursor: pointer;
+}
+
+.chip:hover {
+    border-color: #C0392B;
+    color: #C0392B;
+}
+
+.chip-activo {
+    background: #C0392B;
+    border-color: #C0392B;
+    color: #fff;
+}
+
+.chip-activo:hover {
+    background: #922B21;
+    border-color: #922B21;
+    color: #fff;
+}
+
+/* Badge restricción en tarjeta */
+.badge-restriccion {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: #B7770D;
+    background: #FEF9E7;
+    border: 1px solid #FAD7A0;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-bottom: 6px;
+    margin-left: 4px;
+}
+
+/* Filtros admitidos en formulario */
+.filtros-admitidos {
+    background: #F5F5F0;
+    border: 1px solid #E5E5EA;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.filtros-admitidos h3 {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge-opcional {
+    font-size: 10px;
+    font-weight: 500;
+    background: #EBF5FB;
+    color: #1A5276;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   MENSAJES
+   ============================================================ */
+.lista-mensajes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mensaje-item {
+    background: #F5F5F0;
+    border: 1px solid #E5E5EA;
+    border-radius: 6px;
+    padding: 12px 14px;
+}
+
+.mensaje-nuevo {
+    background: #EBF5FB;
+    border-color: #AED6F1;
+}
+
+.mensaje-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.mensaje-cabecera strong {
+    font-size: 13px;
+    font-weight: 500;
+    display: block;
+}
+
+.mensaje-evento {
+    font-size: 11px;
+    color: #8E8E93;
+}
+
+.mensaje-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mensaje-fecha {
+    font-size: 11px;
+    color: #8E8E93;
+}
+
+.mensaje-texto {
+    font-size: 13px;
+    color: #636366;
+    line-height: 1.6;
+    margin-bottom: 6px;
+}
+
+.mensaje-link {
+    font-size: 12px;
+    color: #C0392B;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.badge-nuevo {
+    font-size: 10px;
+    font-weight: 500;
+    background: #C0392B;
+    color: #fff;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* Evento badges en línea */
+.evento-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.restricciones-resumen {
+    background: #F5F5F0;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+}
+
+.restricciones-resumen .tipos-admitidos-label {
+    margin: 0;
+    font-size: 11px;
+    color: #8E8E93;
+    line-height: 1.8;
+}
+
+/* ============================================================
+   NUEVOS ESTILOS — Añadir al final de style.css
+   ============================================================ */
+
+/* Checkboxes grupo */
+.checkboxes-grupo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #1C1C1E;
+    cursor: pointer;
+    padding: 6px 12px;
+    border: 1px solid #E5E5EA;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    accent-color: #C0392B;
+}
+
+.checkbox-label:has(input:checked) {
+    border-color: #C0392B;
+    background: #F9EBEA;
+    color: #922B21;
+}
+
+/* Badge tipo admitido */
+.badge-tipo-admitido {
+    background: #F5F5F0;
+    color: #636366;
+    border: 1px solid #E5E5EA;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: inline-block;
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+
+/* Tipos admitidos en sidebar */
+.tipos-admitidos-label {
+    font-size: 11px;
+    color: #8E8E93;
+    margin-bottom: 4px;
+    margin-top: 8px;
+}
+
+.tipos-admitidos {
+    margin-bottom: 12px;
+}
+
+/* Acciones organizador en detalle evento */
+.acciones-organizador {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+/* Botón borrar comentario */
+.comentario-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-borrar-com {
+    color: #C7C7CC;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.btn-borrar-com:hover {
+    color: #C0392B;
+}
+
+/* Lista asistentes con expulsar */
+.lista-asistentes li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lista-asistentes li div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.lista-asistentes li span {
+    font-size: 12px;
+    color: #8E8E93;
+}
+
+/* Cartel preview en editar */
+.cartel-preview {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border: 1px solid #E5E5EA;
+}
+
+/* Chips filtro mis coches */
+.filtros-chips {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #E5E5EA;
+    background: #fff;
+    color: #8E8E93;
+    cursor: pointer;
+}
+
+.chip:hover {
+    border-color: #C0392B;
+    color: #C0392B;
+}
+
+.chip-activo {
+    background: #C0392B;
+    border-color: #C0392B;
+    color: #fff;
+}
+
+.chip-activo:hover {
+    background: #922B21;
+    border-color: #922B21;
+    color: #fff;
+}
+
+/* Badge restricción en tarjeta */
+.badge-restriccion {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: #B7770D;
+    background: #FEF9E7;
+    border: 1px solid #FAD7A0;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-bottom: 6px;
+    margin-left: 4px;
+}
+
+/* Filtros admitidos en formulario */
+.filtros-admitidos {
+    background: #F5F5F0;
+    border: 1px solid #E5E5EA;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.filtros-admitidos h3 {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge-opcional {
+    font-size: 10px;
+    font-weight: 500;
+    background: #EBF5FB;
+    color: #1A5276;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   MENSAJES
+   ============================================================ */
+.lista-mensajes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mensaje-item {
+    background: #F5F5F0;
+    border: 1px solid #E5E5EA;
+    border-radius: 6px;
+    padding: 12px 14px;
+}
+
+.mensaje-nuevo {
+    background: #EBF5FB;
+    border-color: #AED6F1;
+}
+
+.mensaje-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.mensaje-cabecera strong {
+    font-size: 13px;
+    font-weight: 500;
+    display: block;
+}
+
+.mensaje-evento {
+    font-size: 11px;
+    color: #8E8E93;
+}
+
+.mensaje-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mensaje-fecha {
+    font-size: 11px;
+    color: #8E8E93;
+}
+
+.mensaje-texto {
+    font-size: 13px;
+    color: #636366;
+    line-height: 1.6;
+    margin-bottom: 6px;
+}
+
+.mensaje-link {
+    font-size: 12px;
+    color: #C0392B;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.badge-nuevo {
+    font-size: 10px;
+    font-weight: 500;
+    background: #C0392B;
+    color: #fff;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* Evento badges en línea */
+.evento-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.restricciones-resumen {
+    background: #F5F5F0;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+}
+
+.restricciones-resumen .tipos-admitidos-label {
+    margin: 0;
+    font-size: 11px;
+    color: #8E8E93;
+    line-height: 1.8;
+}
+
+/* Badges en tarjeta evento */
+.tarjeta-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 6px;
+    align-items: center;
 }
