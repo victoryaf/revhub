@@ -2215,3 +2215,8 @@ footer {
     margin-bottom: 6px;
     align-items: center;
 }
+
+/* Fila usuario bloqueado */
+.fila-bloqueado td {
+    opacity: 0.5;
+}

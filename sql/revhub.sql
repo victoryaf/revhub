@@ -19,7 +19,7 @@ CREATE TABLE usuarios (
   contrasena     VARCHAR(255)  NOT NULL,
   foto_perfil    VARCHAR(255),
   descripcion    TEXT,
-  rol            ENUM('usuario', 'organizador', 'admin') NOT NULL DEFAULT 'usuario',
+  rol            ENUM('usuario', 'organizador', 'admin', 'bloqueado') NOT NULL DEFAULT 'usuario',
   fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
