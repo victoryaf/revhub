@@ -1,7 +1,7 @@
 <?php
 /* Endpoint para cargar vehículos de un usuario por AJAX */
 $conexion = null;
-include '../php/conexion.php';
+include 'php/conexion.php';
 
 if (!isset($conexion) || !$conexion) {
     echo '[]';

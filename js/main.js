@@ -28,9 +28,27 @@ document.addEventListener('click', function(e) {
 /* --- Cerrar modal con Escape --- */
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-        var modales = document.querySelectorAll('.modal-overlay');
-        modales.forEach(function(m) {
+        document.querySelectorAll('.modal-overlay').forEach(function(m) {
             m.style.display = 'none';
         });
+    }
+});
+
+/* --- Menú hamburguesa --- */
+function toggleMenu() {
+    var nav = document.getElementById('nav-movil');
+    if (nav) {
+        nav.classList.toggle('abierto');
+    }
+}
+
+/* --- Cerrar menú al hacer clic fuera --- */
+document.addEventListener('click', function(e) {
+    var nav = document.getElementById('nav-movil');
+    var hamburguesa = document.querySelector('.hamburguesa');
+    if (nav && nav.classList.contains('abierto')) {
+        if (!nav.contains(e.target) && e.target !== hamburguesa && !hamburguesa.contains(e.target)) {
+            nav.classList.remove('abierto');
+        }
     }
 });

@@ -62,16 +62,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
     $texto_r   = trim($_POST['texto_respuesta']);
 
     if (empty($texto_r)) {
-        /* Reabrir modal con error */
-        $responder_msg = [
-            'id_destinatario' => $id_dest,
-            'id_evento_r'     => $id_ev_r,
-            'error'           => 'El mensaje no puede estar vacío.'
-        ];
         $dest_u = mysqli_fetch_assoc(mysqli_query($conexion,
             "SELECT username FROM usuarios WHERE id_usuario = $id_dest"
         ));
-        $responder_msg['username'] = $dest_u['username'];
+        $responder_msg = [
+            'id_destinatario' => $id_dest,
+            'id_evento_r'     => $id_ev_r,
+            'username'        => $dest_u['username'],
+            'error'           => 'El mensaje no puede estar vacío.'
+        ];
     } else {
         $texto_e  = mysqli_real_escape_string($conexion, $texto_r);
         $asunto_e = mysqli_real_escape_string($conexion, 'Respuesta de ' . $_SESSION['username']);
@@ -112,7 +111,8 @@ $usuario = mysqli_fetch_assoc(mysqli_query($conexion,
 
 /* --- Mensajes recibidos --- */
 $mensajes = mysqli_query($conexion,
-    "SELECT m.*, u.username AS remitente_username, u.id_usuario AS remitente_id, e.nombre AS nombre_evento
+    "SELECT m.*, u.username AS remitente_username, u.id_usuario AS remitente_id,
+            e.nombre AS nombre_evento
      FROM mensajes m
      JOIN usuarios u ON m.id_remitente = u.id_usuario
      LEFT JOIN eventos e ON m.id_evento = e.id_evento
@@ -121,13 +121,17 @@ $mensajes = mysqli_query($conexion,
 );
 
 $num_mensajes_nuevos = mysqli_fetch_assoc(mysqli_query($conexion,
-    "SELECT COUNT(*) as total FROM mensajes WHERE id_destinatario = $id_usuario AND leido = 0"
+    "SELECT COUNT(*) as total FROM mensajes
+     WHERE id_destinatario = $id_usuario AND leido = 0"
 ))['total'];
 
 /* --- Estadísticas --- */
-$num_vehiculos   = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as t FROM vehiculos WHERE id_usuario = $id_usuario"))['t'];
-$num_asistencias = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as t FROM inscripciones WHERE id_usuario = $id_usuario"))['t'];
-$num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) as t FROM eventos WHERE id_usuario = $id_usuario"))['t'];
+$num_vehiculos   = mysqli_fetch_assoc(mysqli_query($conexion,
+    "SELECT COUNT(*) as t FROM vehiculos WHERE id_usuario = $id_usuario"))['t'];
+$num_asistencias = mysqli_fetch_assoc(mysqli_query($conexion,
+    "SELECT COUNT(*) as t FROM inscripciones WHERE id_usuario = $id_usuario"))['t'];
+$num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion,
+    "SELECT COUNT(*) as t FROM eventos WHERE id_usuario = $id_usuario"))['t'];
 ?>
 
 <main>
@@ -147,10 +151,13 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) a
                             <img src="/revhub/img/perfiles/<?= htmlspecialchars($usuario['foto_perfil']) ?>"
                                  alt="<?= htmlspecialchars($usuario['username']) ?>">
                         <?php else: ?>
-                            <i class="fa-solid fa-user"></i>
+                            <i class="fa-regular fa-user"></i>
                         <?php endif; ?>
                     </div>
-                    <h2 class="perfil-nombre"><?= htmlspecialchars($usuario['nombre']) ?> <?= htmlspecialchars($usuario['apellidos']) ?></h2>
+                    <h2 class="perfil-nombre">
+                        <?= htmlspecialchars($usuario['nombre']) ?>
+                        <?= htmlspecialchars($usuario['apellidos']) ?>
+                    </h2>
                     <p class="perfil-username">@<?= htmlspecialchars($usuario['username']) ?></p>
                     <span class="badge-rol badge-<?= $usuario['rol'] ?>"><?= $usuario['rol'] ?></span>
 
@@ -177,7 +184,7 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) a
 
                     <button class="btn btn-full" onclick="abrirModal('modal-editar-perfil')"
                             style="margin-top:14px;">
-                        Editar perfil
+                        <i class="fa-solid fa-pen"></i> Editar perfil
                     </button>
                 </div>
             </div>
@@ -185,11 +192,11 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) a
             <!-- Contenido -->
             <div class="perfil-main">
 
-                <!-- Mensajes recibidos -->
+                <!-- Mensajes -->
                 <div class="sidebar-card">
                     <div class="seccion-header">
                         <h3>
-                            Mensajes
+                            <i class="fa-regular fa-envelope"></i> Mensajes
                             <?php if ($num_mensajes_nuevos > 0): ?>
                                 <span class="badge-nuevo">
                                     <?= $num_mensajes_nuevos ?> nuevo<?= $num_mensajes_nuevos > 1 ? 's' : '' ?>
@@ -217,10 +224,16 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) a
                                         </span>
                                         <?php if (!$msg['leido']): ?>
                                             <a href="/revhub/perfil.php?leer=<?= $msg['id_mensaje'] ?>"
-                                               class="btn-accion btn-sm">Leído</a>
+                                               class="btn-accion btn-sm">
+                                               <i class="fa-solid fa-check"></i> Leído
+                                            </a>
                                         <?php endif; ?>
                                         <button class="btn-accion btn-sm"
-                                                onclick="abrirResponder(<?= $msg['remitente_id'] ?>, '<?= htmlspecialchars($msg['remitente_username']) ?>', <?= $msg['id_evento'] ?? 'null' ?>)">
+                                                onclick="abrirResponder(
+                                                    <?= $msg['remitente_id'] ?>,
+                                                    '<?= htmlspecialchars($msg['remitente_username']) ?>',
+                                                    <?= $msg['id_evento'] ?? 'null' ?>
+                                                )">
                                             <i class="fa-solid fa-reply"></i> Responder
                                         </button>
                                         <a href="/revhub/perfil.php?borrar_msg=<?= $msg['id_mensaje'] ?>"
@@ -248,7 +261,7 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) a
                 <!-- Mis vehículos -->
                 <div class="sidebar-card">
                     <div class="seccion-header">
-                        <h3>Mis vehículos</h3>
+                        <h3><i class="fa-solid fa-car"></i> Mis vehículos</h3>
                         <a href="/revhub/vehiculos.php" class="btn-accion">Gestionar</a>
                     </div>
                     <?php
@@ -270,7 +283,8 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) a
                                 </div>
                                 <div>
                                     <strong><?= htmlspecialchars($v['marca']) ?> <?= htmlspecialchars($v['modelo']) ?></strong>
-                                    <p><?= htmlspecialchars($v['anio']) ?> &middot; <?= htmlspecialchars($v['tipo_vehiculo']) ?> &middot; <span class="vehiculo-matricula"><?= htmlspecialchars($v['matricula']) ?></span></p>
+                                    <p><?= htmlspecialchars($v['anio']) ?> &middot; <?= htmlspecialchars($v['tipo_vehiculo']) ?> &middot;
+                                    <span class="vehiculo-matricula"><?= htmlspecialchars($v['matricula']) ?></span></p>
                                 </div>
                             </li>
                             <?php endwhile; ?>
@@ -282,7 +296,7 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) a
 
                 <!-- Historial -->
                 <div class="sidebar-card">
-                    <h3>Historial de eventos</h3>
+                    <h3><i class="fa-regular fa-calendar"></i> Historial de eventos</h3>
                     <?php
                     $historial = mysqli_query($conexion,
                         "SELECT e.*, v.marca, v.modelo
@@ -299,8 +313,17 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) a
                             <li>
                                 <div>
                                     <strong><?= htmlspecialchars($h['nombre']) ?></strong>
-                                    <p><?= date('d/m/Y', strtotime($h['fecha'])) ?> &middot; <?= htmlspecialchars($h['ubicacion']) ?></p>
-                                    <p><?= htmlspecialchars($h['marca']) ?> <?= htmlspecialchars($h['modelo']) ?></p>
+                                    <p>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        <?= date('d/m/Y', strtotime($h['fecha'])) ?>
+                                        &middot;
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        <?= htmlspecialchars($h['ubicacion']) ?>
+                                    </p>
+                                    <p>
+                                        <i class="fa-solid fa-car"></i>
+                                        <?= htmlspecialchars($h['marca']) ?> <?= htmlspecialchars($h['modelo']) ?>
+                                    </p>
                                 </div>
                                 <a href="/revhub/evento.php?id=<?= $h['id_evento'] ?>"
                                    class="badge badge-<?= $h['tipo_evento'] ?>">
@@ -314,12 +337,14 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) a
                     <?php endif; ?>
                 </div>
 
-                <!-- Eventos que organizo -->
+                <!-- Eventos organizados -->
                 <?php if ($usuario['rol'] === 'organizador' || $usuario['rol'] === 'admin'): ?>
                 <div class="sidebar-card">
                     <div class="seccion-header">
-                        <h3>Eventos que organizo</h3>
-                        <a href="/revhub/crear_evento.php" class="btn-accion">Crear evento</a>
+                        <h3><i class="fa-solid fa-star"></i> Eventos que organizo</h3>
+                        <a href="/revhub/crear_evento.php" class="btn-accion">
+                            <i class="fa-solid fa-plus"></i> Crear evento
+                        </a>
                     </div>
                     <?php
                     $organiza = mysqli_query($conexion,
@@ -332,7 +357,13 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) a
                             <li>
                                 <div>
                                     <strong><?= htmlspecialchars($ev['nombre']) ?></strong>
-                                    <p><?= date('d/m/Y', strtotime($ev['fecha'])) ?> &middot; <?= htmlspecialchars($ev['ubicacion']) ?></p>
+                                    <p>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        <?= date('d/m/Y', strtotime($ev['fecha'])) ?>
+                                        &middot;
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        <?= htmlspecialchars($ev['ubicacion']) ?>
+                                    </p>
                                 </div>
                                 <a href="/revhub/evento.php?id=<?= $ev['id_evento'] ?>"
                                    class="btn-accion btn-sm">Ver</a>
@@ -350,7 +381,7 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) a
     </div>
 </main>
 
-<!-- ===== MODAL RESPONDER MENSAJE ===== -->
+<!-- ===== MODAL RESPONDER ===== -->
 <div class="modal-overlay" id="modal-responder"
      <?= $responder_msg ? 'style="display:flex;"' : '' ?>>
     <div class="modal">
@@ -360,30 +391,30 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) a
             <?= $responder_msg ? 'A: ' . htmlspecialchars($responder_msg['username']) : '' ?>
         </p>
 
-        <?php if ($responder_msg && $responder_msg['error']): ?>
+        <?php if ($responder_msg && isset($responder_msg['error'])): ?>
             <div class="alerta alerta-error"><?= $responder_msg['error'] ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="" id="form-responder">
+        <form method="POST" action="">
             <input type="hidden" name="accion" value="responder">
             <input type="hidden" name="id_destinatario" id="input-destinatario"
                    value="<?= $responder_msg ? $responder_msg['id_destinatario'] : '' ?>">
             <input type="hidden" name="id_evento_r" id="input-evento-r"
                    value="<?= $responder_msg ? ($responder_msg['id_evento_r'] ?? '') : '' ?>">
-
             <div class="form-group">
                 <label for="texto_respuesta">Mensaje</label>
                 <textarea id="texto_respuesta" name="texto_respuesta" rows="5"
-                          placeholder="Escribe tu respuesta..."><?= $responder_msg ? '' : '' ?></textarea>
+                          placeholder="Escribe tu respuesta..."></textarea>
             </div>
-            <button type="submit" class="btn btn-full">Enviar respuesta</button>
+            <button type="submit" class="btn btn-full">
+                <i class="fa-solid fa-paper-plane"></i> Enviar respuesta
+            </button>
         </form>
     </div>
 </div>
 
 <!-- ===== MODAL EDITAR PERFIL ===== -->
-<div class="modal-overlay" id="modal-editar-perfil"
-     <?= ($error && strpos($error, 'nombre') !== false) ? 'style="display:flex;"' : '' ?>>
+<div class="modal-overlay" id="modal-editar-perfil">
     <div class="modal modal-grande">
         <button class="modal-cerrar" onclick="cerrarModal('modal-editar-perfil')">&times;</button>
         <h2>Editar perfil</h2>
@@ -418,13 +449,14 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT COUNT(*) a
                        accept="image/jpg,image/jpeg,image/png,image/webp">
                 <small class="form-ayuda">JPG, PNG o WebP · Máximo 20 MB</small>
             </div>
-            <button type="submit" class="btn btn-full">Guardar cambios</button>
+            <button type="submit" class="btn btn-full">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
+            </button>
         </form>
     </div>
 </div>
 
 <script>
-/* Rellenar modal de respuesta con los datos del mensaje */
 function abrirResponder(idDestinatario, username, idEvento) {
     document.getElementById('input-destinatario').value = idDestinatario;
     document.getElementById('input-evento-r').value     = idEvento || '';

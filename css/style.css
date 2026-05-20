@@ -1081,9 +1081,9 @@ footer {
     margin-bottom: 4px;
 }
 
-.badge-usuario      { background: #EBF5FB; color: #1A5276; }
-.badge-organizador  { background: #EAFAF1; color: #1E8449; }
-.badge-admin        { background: #FDEDEC; color: #922B21; }
+.badge-usuario      { background: #F5F5F0;  color: #636366; border: 1px solid #E5E5EA; }
+.badge-organizador  { background: #EAFAF1;  color: #27AE60; border: 1px solid #A9DFBF; }
+.badge-admin        { background: #FDEDEC;  color: #922B21; border: 1px solid #F5B7B1; }
 
 /* Lista vehículos en perfil */
 .lista-vehiculos {
@@ -1338,10 +1338,39 @@ footer {
 
 /* Tipos admitidos en sidebar */
 .tipos-admitidos-label {
-    font-size: 11px;
-    color: #8E8E93;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #1C1C1E;
     margin-bottom: 4px;
-    margin-top: 8px;
+    margin-top: 4px;
+}
+
+/* Distancia ruta */
+.ruta-distancia {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1C1C1E;
+    margin: 10px 0;
+    padding: 8px 10px;
+    background: #F5F5F0;
+    border-radius: 6px;
+}
+
+.ruta-distancia i {
+    color: #C0392B;
+}
+
+/* Mapa */
+.mapa-contenedor {
+    height: 250px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #E5E5EA;
 }
 
 .tipos-admitidos {
@@ -1501,8 +1530,8 @@ footer {
 }
 
 .mensaje-nuevo {
-    background: #EBF5FB;
-    border-color: #AED6F1;
+    background: #FEF9E7;
+    border-color: #F9E4A0;
 }
 
 .mensaje-cabecera {
@@ -1554,7 +1583,7 @@ footer {
 .badge-nuevo {
     font-size: 10px;
     font-weight: 500;
-    background: #C0392B;
+    background: #B7770D;
     color: #fff;
     padding: 2px 7px;
     border-radius: 10px;
@@ -1645,4 +1674,93 @@ footer {
     font-size: 14px;
     color: #8E8E93;
     margin-bottom: 24px;
+}
+
+/* ============================================================
+   MENÚ MÓVIL
+   ============================================================ */
+
+/* ============================================================
+   MENÚ MÓVIL
+   ============================================================ */
+.nav-escritorio {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.hamburguesa {
+    display: none;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.nav-movil {
+    display: none;
+    flex-direction: column;
+    background: #2C2C2E;
+    border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.nav-movil.abierto {
+    display: flex;
+}
+
+.nav-movil a,
+.nav-movil button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    color: #8E8E93;
+    font-size: 14px;
+    font-family: 'Inter', Arial, sans-serif;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+}
+
+.nav-movil a:hover,
+.nav-movil button:hover {
+    color: #fff;
+    background: rgba(255,255,255,.04);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    .nav-escritorio   { display: none !important; }
+    .hamburguesa      { display: block !important; }
+    .eventos-grid     { grid-template-columns: 1fr; }
+    .vehiculos-grid   { grid-template-columns: 1fr; }
+    .form-2col        { grid-template-columns: 1fr; }
+    .evento-layout    { grid-template-columns: 1fr; }
+    .evento-meta-grid { grid-template-columns: 1fr 1fr; }
+    .perfil-layout    { grid-template-columns: 1fr; }
+    .admin-stats      { grid-template-columns: repeat(2, 1fr); }
+    .pie-inner        { flex-direction: column; align-items: flex-start; }
+}
+
+/* Fix mapa Leaflet debajo de los modales */
+.mapa-contenedor {
+    z-index: 0;
+    position: relative;
+}
+
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom {
+    z-index: 1 !important;
+}
+
+.modal-overlay {
+    z-index: 200;
 }

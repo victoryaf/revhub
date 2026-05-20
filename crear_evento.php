@@ -1,5 +1,5 @@
 <?php
-include 'includes/cabecera.php';
+session_start();
 include 'php/conexion.php';
 
 if (!isset($_SESSION['usuario']) || ($_SESSION['rol'] !== 'organizador' && $_SESSION['rol'] !== 'admin')) {
@@ -25,6 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fecha             = trim($_POST['fecha']);
     $hora              = trim($_POST['hora']);
     $ubicacion         = trim($_POST['ubicacion']);
+    $salida            = trim($_POST['salida'] ?? '');
+    $destino           = trim($_POST['destino'] ?? '');
+    $puntos_intermedios= trim($_POST['puntos_intermedios'] ?? '');
     $max_participantes = trim($_POST['max_participantes']);
     $tipo_evento       = trim($_POST['tipo_evento']);
     $tipos_admitidos   = isset($_POST['tipos_admitidos'])  ? implode(',', $_POST['tipos_admitidos'])  : '';
@@ -38,10 +41,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fecha_e   = mysqli_real_escape_string($conexion, $fecha);
         $hora_e    = mysqli_real_escape_string($conexion, $hora);
         $ubic_e    = mysqli_real_escape_string($conexion, $ubicacion);
+        $salida_e  = mysqli_real_escape_string($conexion, $salida);
+        $destino_e = mysqli_real_escape_string($conexion, $destino);
+        $puntos_e  = mysqli_real_escape_string($conexion, $puntos_intermedios);
         $max_e     = (int)$max_participantes;
         $tipo_e    = mysqli_real_escape_string($conexion, $tipo_evento);
         $tipos_e   = mysqli_real_escape_string($conexion, $tipos_admitidos);
         $marcas_e  = mysqli_real_escape_string($conexion, $marcas_admitidas);
+
+        $salida_sql  = $salida  ? "'$salida_e'"  : 'NULL';
+        $destino_sql = $destino ? "'$destino_e'" : 'NULL';
+        $puntos_sql  = $puntos_intermedios ? "'$puntos_e'" : 'NULL';
 
         $cartel_sql = 'NULL';
         if (isset($_FILES['cartel']) && $_FILES['cartel']['error'] === 0) {
@@ -49,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $perm = ['jpg','jpeg','png','webp'];
             if (!in_array($ext, $perm)) {
                 $error = 'El cartel debe ser JPG, PNG o WebP.';
-            } elseif ($_FILES['cartel']['size'] > 2*1024*1024) {
+            } elseif ($_FILES['cartel']['size'] > 20*1024*1024) {
                 $error = 'El cartel no puede superar 20 MB.';
             } else {
                 $nc = uniqid('e_') . '.' . $ext;
@@ -61,8 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($error)) {
             $res = mysqli_query($conexion,
-                "INSERT INTO eventos (id_usuario, nombre, descripcion, fecha, hora, ubicacion, max_participantes, tipo_evento, tipos_admitidos, marcas_admitidas, cartel)
-                 VALUES ($id_usuario,'$nombre_e','$desc_e','$fecha_e','$hora_e','$ubic_e',$max_e,'$tipo_e','$tipos_e','$marcas_e',$cartel_sql)"
+                "INSERT INTO eventos (id_usuario, nombre, descripcion, fecha, hora, ubicacion, salida, destino, puntos_intermedios, max_participantes, tipo_evento, tipos_admitidos, marcas_admitidas, cartel)
+                 VALUES ($id_usuario,'$nombre_e','$desc_e','$fecha_e','$hora_e','$ubic_e',$salida_sql,$destino_sql,$puntos_sql,$max_e,'$tipo_e','$tipos_e','$marcas_e',$cartel_sql)"
             );
             if ($res) {
                 header('Location: /revhub/evento.php?id=' . mysqli_insert_id($conexion));
@@ -73,6 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+include 'includes/cabecera.php';
 ?>
 
 <main>
@@ -114,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="form-group">
-                    <label for="ubicacion">Ubicación</label>
+                    <label for="ubicacion">Ubicación general</label>
                     <input type="text" id="ubicacion" name="ubicacion"
                            placeholder="Ciudad, provincia..."
                            value="<?= htmlspecialchars($_POST['ubicacion'] ?? '') ?>">
@@ -123,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="form-2col">
                     <div class="form-group">
                         <label for="tipo_evento">Tipo de evento</label>
-                        <select id="tipo_evento" name="tipo_evento">
+                        <select id="tipo_evento" name="tipo_evento" onchange="toggleRuta(this.value)">
                             <option value="">-- Selecciona --</option>
                             <option value="quedada"    <?= ($_POST['tipo_evento'] ?? '') === 'quedada'    ? 'selected':'' ?>>Quedada</option>
                             <option value="ruta"       <?= ($_POST['tipo_evento'] ?? '') === 'ruta'       ? 'selected':'' ?>>Ruta</option>
@@ -140,7 +152,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
 
-                <!-- Restricciones -->
+                <div id="campos-ruta" style="display:<?= ($_POST['tipo_evento'] ?? '') === 'ruta' ? 'block' : 'none' ?>">
+                    <div class="filtros-admitidos">
+                        <h3>Datos de la ruta <span class="badge-opcional">Solo rutas</span></h3>
+                        <p class="subtitulo">Introduce el punto de salida y el destino para mostrar el mapa</p>
+                        <div class="form-2col">
+                            <div class="form-group">
+                                <label for="salida">Punto de salida</label>
+                                <input type="text" id="salida" name="salida"
+                                       placeholder="Viana do Bolo, España"
+                                       value="<?= htmlspecialchars($_POST['salida'] ?? '') ?>">
+                            </div>
+                            <div class="form-group">
+                                <label for="destino">Destino</label>
+                                <input type="text" id="destino" name="destino"
+                                       placeholder="A Gudiña, España"
+                                       value="<?= htmlspecialchars($_POST['destino'] ?? '') ?>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="puntos_intermedios">Puntos intermedios</label>
+                            <input type="text" id="puntos_intermedios" name="puntos_intermedios"
+                                   placeholder="Vilariño de Conso, España; As Portas, España"
+                                   value="<?= htmlspecialchars($_POST['puntos_intermedios'] ?? '') ?>">
+                            <small class="form-ayuda">Separa cada parada con punto y coma ( ; ) en el orden en que quieres pasar por ellas</small>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="filtros-admitidos">
                     <h3>Restricciones de vehículos <span class="badge-opcional">Opcional</span></h3>
                     <p class="subtitulo">Deja en blanco para admitir cualquier vehículo</p>
@@ -183,7 +222,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="cartel">Cartel del evento</label>
                     <input type="file" id="cartel" name="cartel"
                            accept="image/jpg,image/jpeg,image/png,image/webp">
-                    <small class="form-ayuda">JPG, PNG o WebP · Máximo 2 MB · Recomendado 800×450px</small>
+                    <small class="form-ayuda">JPG, PNG o WebP · Máximo 20 MB · Recomendado 800×450px</small>
                 </div>
 
                 <button type="submit" class="btn btn-full">Crear evento</button>
@@ -191,5 +230,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </main>
+
+<script>
+function toggleRuta(tipo) {
+    var campos = document.getElementById('campos-ruta');
+    campos.style.display = tipo === 'ruta' ? 'block' : 'none';
+}
+</script>
 
 <?php include 'includes/pie.php'; ?>

@@ -1,5 +1,5 @@
 <?php
-include 'includes/cabecera.php';
+session_start();
 include 'php/conexion.php';
 
 /* --- Validar id --- */
@@ -243,6 +243,8 @@ if (isset($_GET['borrar_com']) && is_numeric($_GET['borrar_com']) && isset($_SES
 }
 
 $pct = $evento['max_participantes'] > 0 ? round($inscritos / $evento['max_participantes'] * 100) : 0;
+
+include 'includes/cabecera.php';
 ?>
 
 <main>
@@ -375,9 +377,22 @@ $pct = $evento['max_participantes'] > 0 ? round($inscritos / $evento['max_partic
                 <div class="sidebar-card">
                     <h4>Inscripción</h4>
                     <div class="barra-plazas">
-                        <div class="barra-fill" style="width:<?= $pct ?>%"></div>
+                        <?php
+                        /* Color de la barra según ocupación:
+                           verde < 50%, ámbar 50-80%, rojo > 80% */
+                        if ($pct < 50) {
+                            $color_barra = '#27AE60';
+                        } elseif ($pct < 80) {
+                            $color_barra = '#B7770D';
+                        } else {
+                            $color_barra = '#C0392B';
+                        }
+                        ?>
+                        <div class="barra-fill" style="width:<?= $pct ?>%; background:<?= $color_barra ?>"></div>
                     </div>
-                    <p class="plazas-texto"><?= $inscritos ?> de <?= $evento['max_participantes'] ?> plazas ocupadas</p>
+                    <p class="plazas-texto <?= $pct < 50 ? 'estado-activo' : ($pct < 80 ? 'estado-pendiente' : 'estado-bloqueado') ?>">
+                        <?= $inscritos ?> de <?= $evento['max_participantes'] ?> plazas ocupadas
+                    </p>
 
                     <?php if (!empty($tipos_admitidos) || !empty($marcas_admitidas)): ?>
                         <div class="restricciones-resumen">
@@ -473,6 +488,36 @@ $pct = $evento['max_participantes'] > 0 ? round($inscritos / $evento['max_partic
                         <p class="sin-resultados">Nadie inscrito aún.</p>
                     <?php endif; ?>
                 </div>
+
+                <!-- Mapa de ruta -->
+                <?php if ($evento['tipo_evento'] === 'ruta' && !empty($evento['salida']) && !empty($evento['destino'])): ?>
+                <div class="sidebar-card">
+                    <h4><i class="fa-solid fa-route"></i> Ruta</h4>
+                    <p class="tipos-admitidos-label">
+                        <i class="fa-solid fa-circle-dot" style="color:#C0392B"></i>
+                        <?= htmlspecialchars($evento['salida']) ?>
+                    </p>
+                    <?php if (!empty($evento['puntos_intermedios'])): ?>
+                        <?php foreach (explode(';', $evento['puntos_intermedios']) as $parada): ?>
+                            <?php if (trim($parada)): ?>
+                            <p class="tipos-admitidos-label">
+                                <i class="fa-solid fa-circle" style="color:#C0392B;font-size:8px;"></i>
+                                <?= htmlspecialchars(trim($parada)) ?>
+                            </p>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                    <p class="tipos-admitidos-label">
+                        <i class="fa-solid fa-location-dot" style="color:#C0392B"></i>
+                        <?= htmlspecialchars($evento['destino']) ?>
+                    </p>
+                    <p class="ruta-distancia" id="ruta-distancia">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span id="km-texto">Calculando distancia...</span>
+                    </p>
+                    <div id="mapa-ruta" class="mapa-contenedor"></div>
+                </div>
+                <?php endif; ?>
 
             </div>
         </div>
@@ -621,19 +666,119 @@ function cargarVehiculos(idUsuario) {
     }
 
     /* Hacemos una petición a un endpoint sencillo */
-    fetch('/revhub/php/get_vehiculos.php?id_usuario=' + idUsuario)
+    fetch('/revhub/get_vehiculos.php?id_usuario=' + idUsuario)
         .then(function(r) { return r.json(); })
         .then(function(vehiculos) {
             select.innerHTML = '<option value="">-- Elige un vehículo --</option>';
-            vehiculos.forEach(function(v) {
-                var opt = document.createElement('option');
-                opt.value = v.id_vehiculo;
-                opt.textContent = v.marca + ' ' + v.modelo + ' (' + v.matricula + ')';
-                select.appendChild(opt);
-            });
+            if (vehiculos.length === 0) {
+                select.innerHTML = '<option value="">Este usuario no tiene vehículos</option>';
+            } else {
+                vehiculos.forEach(function(v) {
+                    var opt = document.createElement('option');
+                    opt.value = v.id_vehiculo;
+                    opt.textContent = v.marca + ' ' + v.modelo + ' (' + v.matricula + ')';
+                    select.appendChild(opt);
+                });
+            }
+            grupo.style.display = 'block';
+        })
+        .catch(function() {
+            select.innerHTML = '<option value="">Error al cargar vehículos</option>';
             grupo.style.display = 'block';
         });
 }
+</script>
+<?php endif; ?>
+
+<?php if ($evento['tipo_evento'] === 'ruta' && !empty($evento['salida']) && !empty($evento['destino'])): ?>
+<!-- Leaflet CSS y JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* Geocodificar y trazar ruta con OSRM incluyendo puntos intermedios */
+var salida   = <?= json_encode($evento['salida']) ?>;
+var destino  = <?= json_encode($evento['destino']) ?>;
+var puntosRaw = <?= json_encode($evento['puntos_intermedios'] ?? '') ?>;
+
+/* Parsear puntos intermedios separados por ; */
+var puntosIntermedios = puntosRaw
+    ? puntosRaw.split(';').map(function(p) { return p.trim(); }).filter(function(p) { return p.length > 0; })
+    : [];
+
+function geocodificar(lugar) {
+    return fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(lugar))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.length === 0) throw new Error('No encontrado: ' + lugar);
+            return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+        });
+}
+
+/* Geocodificar todos los puntos en orden: salida + intermedios + destino */
+var todosLugares = [salida].concat(puntosIntermedios).concat([destino]);
+
+Promise.all(todosLugares.map(geocodificar)).then(function(coords) {
+    var puntoSalida  = coords[0];
+    var puntoDestino = coords[coords.length - 1];
+
+    var mapa = L.map('mapa-ruta').setView(puntoSalida, 8);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(mapa);
+
+    /* Icono verde para salida */
+    var iconoVerde = L.divIcon({
+        html: '<div style="background:#27AE60;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);"></div>',
+        className: '', iconAnchor: [7, 7]
+    });
+    /* Icono rojo para destino */
+    var iconoRojo = L.divIcon({
+        html: '<div style="background:#C0392B;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);"></div>',
+        className: '', iconAnchor: [7, 7]
+    });
+    /* Icono gris para puntos intermedios */
+    var iconoGris = L.divIcon({
+        html: '<div style="background:#8E8E93;width:10px;height:10px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);"></div>',
+        className: '', iconAnchor: [5, 5]
+    });
+
+    L.marker(puntoSalida,  { icon: iconoVerde }).addTo(mapa).bindPopup('Salida: ' + salida);
+    L.marker(puntoDestino, { icon: iconoRojo  }).addTo(mapa).bindPopup('Destino: ' + destino);
+
+    /* Marcadores para puntos intermedios */
+    for (var i = 1; i < coords.length - 1; i++) {
+        L.marker(coords[i], { icon: iconoGris })
+            .addTo(mapa)
+            .bindPopup('Parada: ' + puntosIntermedios[i - 1]);
+    }
+
+    /* Construir URL de OSRM con todos los puntos */
+    var waypoints = coords.map(function(c) { return c[1] + ',' + c[0]; }).join(';');
+    var url = 'https://router.project-osrm.org/route/v1/driving/' + waypoints
+        + '?overview=full&geometries=geojson';
+
+    fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+        if (data.routes && data.routes.length > 0) {
+            L.geoJSON(data.routes[0].geometry, {
+                style: { color: '#C0392B', weight: 4, opacity: 0.8 }
+            }).addTo(mapa);
+
+            var bounds = L.geoJSON(data.routes[0].geometry).getBounds();
+            mapa.fitBounds(bounds, { padding: [20, 20] });
+
+            /* Mostrar distancia total */
+            var km = Math.round(data.routes[0].distance / 1000);
+            var kmTexto = document.getElementById('km-texto');
+            if (kmTexto) {
+                kmTexto.textContent = 'Distancia total: ' + km + ' km';
+            }
+        }
+    });
+}).catch(function(e) {
+    document.getElementById('mapa-ruta').innerHTML =
+        '<p style="padding:12px;color:#8E8E93;font-size:13px;">No se pudo cargar el mapa.</p>';
+});
 </script>
 <?php endif; ?>
 
