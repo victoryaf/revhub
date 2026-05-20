@@ -9,7 +9,7 @@ include 'php/conexion.php';
             <h2>Eventos</h2>
         </div>
 
-        <!-- Filtros -->
+        <!-- Filtros y barra de búsqueda -->
         <form method="GET" action="" class="filtros">
             <?php if (isset($_GET['mis_coches'])): ?>
                 <input type="hidden" name="mis_coches" value="1">
@@ -28,7 +28,7 @@ include 'php/conexion.php';
             <button type="submit" class="btn">Buscar</button>
             <?php if (!empty($_GET['tipo']) || !empty($_GET['buscar'])): ?>
                 <a href="/revhub/eventos.php<?= isset($_GET['mis_coches']) ? '?mis_coches=1' : '' ?>"
-                   class="btn-outline">Limpiar</a>
+                   class="btn-secundario">Limpiar</a>
             <?php endif; ?>
         </form>
 
@@ -36,6 +36,7 @@ include 'php/conexion.php';
         <?php if (isset($_SESSION['usuario'])): ?>
         <div class="filtros-chips">
             <?php
+            // construyo las urls conservando los otros filtros activos
             $params_base = [];
             if (!empty($_GET['tipo']))   $params_base['tipo']   = $_GET['tipo'];
             if (!empty($_GET['buscar'])) $params_base['buscar'] = $_GET['buscar'];
@@ -55,6 +56,7 @@ include 'php/conexion.php';
         <?php endif; ?>
 
         <?php
+        // construyo la consulta con los filtros activos
         $where = "WHERE fecha >= CURDATE()";
 
         if (!empty($_GET['tipo'])) {
@@ -73,7 +75,7 @@ include 'php/conexion.php';
             $eventos_todos[] = $ev;
         }
 
-        /* Filtro mis coches */
+        // si se ha activado el filtro "mis coches", aplico las restricciones de marcas/tipos admitidos
         if (isset($_GET['mis_coches']) && isset($_SESSION['usuario'])) {
             $uid   = $_SESSION['usuario'];
             $mis_v = mysqli_query($conexion,
@@ -89,6 +91,7 @@ include 'php/conexion.php';
                 }
             }
 
+            //solo dejo los eventos que admitan al menos uno de mis vehiculos
             $eventos_todos = array_filter($eventos_todos, function($ev) use ($mis_marcas, $mis_tipos) {
                 if (!empty($ev['tipos_admitidos'])) {
                     $tipos_ev = array_map(function($t){ return strtolower(trim($t)); },
@@ -129,12 +132,12 @@ include 'php/conexion.php';
                     <?php endif; ?>
                 </div>
                 <div class="tarjeta-body">
-                    <div class="tarjeta-badges">
-                        <span class="badge badge-<?= $evento['tipo_evento'] ?>">
+                    <div class="tarjeta-etiquetas">
+                        <span class="etiqueta etiqueta-<?= $evento['tipo_evento'] ?>">
                             <?= htmlspecialchars($evento['tipo_evento']) ?>
                         </span>
                         <?php if (!empty($evento['marcas_admitidas'])): ?>
-                            <span class="badge-restriccion">
+                            <span class="etiqueta-restriccion">
                                 <i class="fa-solid fa-filter"></i>
                                 <?= htmlspecialchars($evento['marcas_admitidas']) ?>
                             </span>

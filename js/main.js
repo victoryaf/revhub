@@ -1,7 +1,3 @@
-/* ============================================================
-   RevHub — JavaScript global
-   ============================================================ */
-
 /* --- Abrir modal --- */
 function abrirModal(id) {
     var modal = document.getElementById(id);

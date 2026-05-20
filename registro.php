@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password  = $_POST['password'];
     $password2 = $_POST['password2'];
 
+    // valido los datos
     if (empty($nombre) || empty($apellidos) || empty($username) || empty($email) || empty($password)) {
         $error = 'Todos los campos son obligatorios.';
     } elseif ($password !== $password2) {
@@ -23,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email_esc    = mysqli_real_escape_string($conexion, $email);
         $username_esc = mysqli_real_escape_string($conexion, $username);
 
+        // compruebo que el email o el username no existan ya
         $comprobacion = mysqli_query($conexion,
             "SELECT id_usuario FROM usuarios
              WHERE email = '$email_esc' OR username = '$username_esc'"
@@ -31,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (mysqli_num_rows($comprobacion) > 0) {
             $error = 'El email o el nombre de usuario ya están en uso.';
         } else {
+            //cifro la contraseña y creo el usuario
             $hash          = password_hash($password, PASSWORD_BCRYPT);
             $nombre_esc    = mysqli_real_escape_string($conexion, $nombre);
             $apellidos_esc = mysqli_real_escape_string($conexion, $apellidos);
@@ -41,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
 
             if ($insertar) {
+                //inicio sesion automaticamente y redirijo al inicio
                 $id = mysqli_insert_id($conexion);
 
                 $_SESSION['usuario']  = $id;

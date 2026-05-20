@@ -25,7 +25,7 @@ if (isset($_GET['desbloquear']) && is_numeric($_GET['desbloquear'])) {
     $ok = 'Usuario desbloqueado.';
 }
 
-/* --- Cambiar rol --- */
+/* --- Cambiar rol permitiendo solo roles válidos --- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['accion'] === 'cambiar_rol') {
     $id_u = (int)$_POST['id_usuario'];
     $rol  = mysqli_real_escape_string($conexion, $_POST['rol']);
@@ -102,8 +102,8 @@ $comentarios = mysqli_query($conexion,
             </div>
         </div>
 
-        <!-- Gestión de usuarios -->
-        <div class="sidebar-card">
+        <!-- Usuarios -->
+        <div class="lateral-card">
             <h3>Gestión de usuarios</h3>
             <div class="tabla-scroll">
                 <table class="tabla-admin">
@@ -125,7 +125,8 @@ $comentarios = mysqli_query($conexion,
                                 <?php if ($u['rol'] === 'bloqueado'): ?>
                                     <span class="estado-bloqueado">Bloqueado</span>
                                 <?php elseif ($u['id_usuario'] == $_SESSION['usuario']): ?>
-                                    <span class="badge-rol badge-<?= $u['rol'] ?>"><?= $u['rol'] ?></span>
+                                    <!-- no me dejo cambiar mi propio rol -->
+                                    <span class="etiqueta-rol etiqueta-<?= $u['rol'] ?>"><?= $u['rol'] ?></span>
                                 <?php else: ?>
                                     <form method="POST" action="" class="form-rol">
                                         <input type="hidden" name="accion" value="cambiar_rol">
@@ -164,8 +165,8 @@ $comentarios = mysqli_query($conexion,
             </div>
         </div>
 
-        <!-- Gestión de eventos -->
-        <div class="sidebar-card">
+        <!-- Eventos -->
+        <div class="lateral-card">
             <h3>Gestión de eventos</h3>
             <div class="tabla-scroll">
                 <table class="tabla-admin">
@@ -182,7 +183,7 @@ $comentarios = mysqli_query($conexion,
                         <?php while ($ev = mysqli_fetch_assoc($eventos)): ?>
                         <tr>
                             <td><?= htmlspecialchars($ev['nombre']) ?></td>
-                            <td><span class="badge badge-<?= $ev['tipo_evento'] ?>"><?= $ev['tipo_evento'] ?></span></td>
+                            <td><span class="etiqueta etiqueta-<?= $ev['tipo_evento'] ?>"><?= $ev['tipo_evento'] ?></span></td>
                             <td><?= date('d/m/Y', strtotime($ev['fecha'])) ?></td>
                             <td><?= htmlspecialchars($ev['username']) ?></td>
                             <td class="acciones-td">
@@ -202,7 +203,7 @@ $comentarios = mysqli_query($conexion,
         </div>
 
         <!-- Últimos comentarios -->
-        <div class="sidebar-card">
+        <div class="lateral-card">
             <h3>Últimos comentarios</h3>
             <div class="tabla-scroll">
                 <table class="tabla-admin">

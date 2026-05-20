@@ -1,6 +1,7 @@
 <?php include 'includes/cabecera.php'; ?>
 
 <main>
+    <!-- Banner principal -->
     <div class="banner">
         <div class="banner-inner">
             <h1>Organiza tu próxima <span>quedada</span></h1>
@@ -22,6 +23,7 @@
             <a href="/revhub/eventos.php">Ver todos &rarr;</a>
         </div>
 
+        <!-- muestro los 3 proximos eventos -->
         <div class="eventos-grid">
             <?php
             include 'php/conexion.php';
@@ -47,8 +49,8 @@
                     <?php endif; ?>
                 </div>
                 <div class="tarjeta-body">
-                    <div class="tarjeta-badges">
-                        <span class="badge badge-<?= $evento['tipo_evento'] ?>">
+                    <div class="tarjeta-etiquetas">
+                        <span class="etiqueta etiqueta-<?= $evento['tipo_evento'] ?>">
                             <?= htmlspecialchars($evento['tipo_evento']) ?>
                         </span>
                     </div>

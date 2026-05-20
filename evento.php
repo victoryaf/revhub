@@ -2,7 +2,7 @@
 session_start();
 include 'php/conexion.php';
 
-/* --- Validar id --- */
+//compruebo que me han pasado un id de evento válido, sino redirijo a eventos.php
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header('Location: /revhub/eventos.php');
     exit;
@@ -10,14 +10,14 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $id = (int)$_GET['id'];
 
-/* --- Obtener evento --- */
+//obtengo los datos del evento junto con el nombre del organizador
 $result = mysqli_query($conexion,
     "SELECT e.*, u.username, u.nombre AS org_nombre, u.id_usuario AS org_id
      FROM eventos e
      JOIN usuarios u ON e.id_usuario = u.id_usuario
      WHERE e.id_evento = $id"
 );
-
+//sino existe el evento redirijo a eventos.php
 if (mysqli_num_rows($result) === 0) {
     header('Location: /revhub/eventos.php');
     exit;
@@ -25,16 +25,15 @@ if (mysqli_num_rows($result) === 0) {
 
 $evento = mysqli_fetch_assoc($result);
 
-/* --- Inscritos --- */
+//cuento el número de inscritos para mostrar la ocupación del evento
 $inscritos = mysqli_fetch_assoc(mysqli_query($conexion,
     "SELECT COUNT(DISTINCT id_usuario) as total FROM inscripciones WHERE id_evento = $id"
 ))['total'];
 
-/* --- ¿Es organizador del evento o admin? --- */
-$es_organizador = isset($_SESSION['usuario']) &&
-    ($evento['id_usuario'] == $_SESSION['usuario'] || $_SESSION['rol'] === 'admin');
+//compruebo si el usuario actual es el organizador del evento o admin para mostrarle opciones adicionales
+$es_organizador = isset($_SESSION['usuario']) && ($evento['id_usuario'] == $_SESSION['usuario'] || $_SESSION['rol'] === 'admin');
 
-/* --- ¿Está inscrito el usuario? --- */
+//compruebo si el usuario ya está inscrito para mostrarle la opción de desinscribirse o el formulario de inscripción
 $inscrito = false;
 if (isset($_SESSION['usuario'])) {
     $uid   = $_SESSION['usuario'];
@@ -45,11 +44,12 @@ if (isset($_SESSION['usuario'])) {
     $inscrito = mysqli_num_rows($check) > 0;
 }
 
-/* --- Vehículos válidos del usuario para el modal --- */
+//busco los vehiculos del usuario para mostrar solo los que cumplen los requisitos del evento
 $vehiculos_usuario = null;
 if (isset($_SESSION['usuario']) && !$inscrito) {
     $uid = $_SESSION['usuario'];
 
+    //filtro por tipos admitidos
     if (!empty($evento['tipos_admitidos'])) {
         $tipos = explode(',', $evento['tipos_admitidos']);
         $conds = [];
@@ -62,6 +62,7 @@ if (isset($_SESSION['usuario']) && !$inscrito) {
         $where_v = "id_usuario = $uid";
     }
 
+    //filtro por marcas admitidas
     if (!empty($evento['marcas_admitidas'])) {
         $marcas = explode(',', $evento['marcas_admitidas']);
         $marcas_conds = [];
@@ -75,24 +76,13 @@ if (isset($_SESSION['usuario']) && !$inscrito) {
     $vehiculos_usuario = mysqli_query($conexion, "SELECT * FROM vehiculos WHERE $where_v");
 }
 
-/* --- Todos los vehículos del usuario para inscripción manual por org --- */
-$todos_vehiculos_usuario = null;
-if (isset($_SESSION['usuario'])) {
-    $uid = $_SESSION['usuario'];
-    $todos_vehiculos_usuario = mysqli_query($conexion,
-        "SELECT * FROM vehiculos WHERE id_usuario = $uid"
-    );
-}
-
-/* --- Tipos y marcas admitidas --- */
+//para mostrar las restricciones del evento en la página de detalles, creo dos arrays con los tipos y marcas admitidos
 $tipos_admitidos  = !empty($evento['tipos_admitidos'])  ? explode(',', $evento['tipos_admitidos'])  : [];
 $marcas_admitidas = !empty($evento['marcas_admitidas']) ? explode(',', $evento['marcas_admitidas']) : [];
 
-/* ============================================================
-   ACCIONES POST
-   ============================================================ */
+/* --- Proceso las acciones del formulario --- */
 
-/* --- Comentar --- */
+//comentar evento
 $error_com = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['accion'] === 'comentar') {
     if (!isset($_SESSION['usuario'])) {
@@ -110,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
     }
 }
 
-/* --- Inscribirse --- */
+//inscribirse al evento
 $error_ins = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['accion'] === 'inscribirse') {
     if (!isset($_SESSION['usuario'])) {
@@ -121,6 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
         $uid         = $_SESSION['usuario'];
         $id_vehiculo = (int)$_POST['id_vehiculo'];
 
+        //comprobar que el vehículo pertenece al usuario
         $check_v = mysqli_query($conexion,
             "SELECT id_vehiculo, marca, tipo_vehiculo FROM vehiculos
              WHERE id_vehiculo = $id_vehiculo AND id_usuario = $uid"
@@ -132,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
             $datos_v = mysqli_fetch_assoc($check_v);
             $valido  = true;
 
-            /* Comprobar tipos admitidos */
+            //compruebo que el vehículo cumple los requisitos del evento
             if (!empty($evento['tipos_admitidos'])) {
                 $tipos_ev  = array_map('trim', explode(',', strtolower($evento['tipos_admitidos'])));
                 $tipos_v   = array_map('trim', explode(',', strtolower($datos_v['tipo_vehiculo'])));
@@ -142,7 +133,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
                 }
             }
 
-            /* Comprobar marcas admitidas */
             if ($valido && !empty($evento['marcas_admitidas'])) {
                 $marcas_ev = array_map('trim', explode(',', strtolower($evento['marcas_admitidas'])));
                 if (!in_array(strtolower(trim($datos_v['marca'])), $marcas_ev)) {
@@ -171,7 +161,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
     if (empty($id_usuario_ins) || empty($id_vehiculo_ins)) {
         $error_ins_manual = 'Selecciona usuario y vehículo.';
     } else {
-        /* Comprobar que no está ya inscrito */
+
+        //compruebo que el vehiculo no esté ya inscrito en el evento
         $check_ya = mysqli_query($conexion,
             "SELECT id_inscripcion FROM inscripciones WHERE id_usuario = $id_usuario_ins AND id_evento = $id"
         );
@@ -219,7 +210,7 @@ if (isset($_GET['desinscribirse']) && isset($_SESSION['usuario'])) {
     exit;
 }
 
-/* --- Expulsar asistente --- */
+/* --- Expulsar asistente (solo para organizadores y administradores) --- */
 if (isset($_GET['expulsar']) && is_numeric($_GET['expulsar']) && $es_organizador) {
     $id_exp = (int)$_GET['expulsar'];
     mysqli_query($conexion, "DELETE FROM inscripciones WHERE id_usuario = $id_exp AND id_evento = $id");
@@ -242,7 +233,17 @@ if (isset($_GET['borrar_com']) && is_numeric($_GET['borrar_com']) && isset($_SES
     exit;
 }
 
+//calculo el porcentaje de plazas ocupadas para mostrar la barra de ocupación
 $pct = $evento['max_participantes'] > 0 ? round($inscritos / $evento['max_participantes'] * 100) : 0;
+
+//color de la barra según el porcentaje de ocupación
+if ($pct < 50) {
+    $color_barra = '#27AE60';
+} elseif ($pct < 80) {
+    $color_barra = '#B7770D';
+} else {
+    $color_barra = '#C0392B';
+}
 
 include 'includes/cabecera.php';
 ?>
@@ -264,19 +265,21 @@ include 'includes/cabecera.php';
                     <?php endif; ?>
                 </div>
 
-                <div class="evento-badges">
-                    <span class="badge badge-<?= $evento['tipo_evento'] ?>"><?= htmlspecialchars($evento['tipo_evento']) ?></span>
+                <!-- Etiquetas del evento -->
+                <div class="evento-etiqueta">
+                    <span class="etiqueta etiqueta-<?= $evento['tipo_evento'] ?>"><?= htmlspecialchars($evento['tipo_evento']) ?></span>
                     <?php foreach ($tipos_admitidos as $ta): ?>
-                        <span class="badge badge-tipo-admitido"><?= htmlspecialchars(trim($ta)) ?></span>
+                        <span class="etiqueta etiqueta-tipo-admitido"><?= htmlspecialchars(trim($ta)) ?></span>
                     <?php endforeach; ?>
                     <?php if (!empty($marcas_admitidas)): ?>
-                        <span class="badge-restriccion">
+                        <span class="etiqueta etiqueta-restriccion">
                             <i class="fa-solid fa-filter"></i>
                             <?= htmlspecialchars(implode(', ', $marcas_admitidas)) ?>
                         </span>
                     <?php endif; ?>
                 </div>
 
+                <!-- Detalles del evento -->
                 <h1><?= htmlspecialchars($evento['nombre']) ?></h1>
                 <p class="evento-descripcion"><?= nl2br(htmlspecialchars($evento['descripcion'])) ?></p>
 
@@ -302,7 +305,7 @@ include 'includes/cabecera.php';
                 <!-- Botones organizador -->
                 <?php if ($es_organizador): ?>
                 <div class="acciones-organizador">
-                    <a href="/revhub/editar_evento.php?id=<?= $id ?>" class="btn-outline">
+                    <a href="/revhub/editar_evento.php?id=<?= $id ?>" class="btn-secundario">
                         <i class="fa-solid fa-pen"></i> Editar evento
                     </a>
                     <a href="/revhub/admin.php?eliminar_evento=<?= $id ?>"
@@ -338,14 +341,15 @@ include 'includes/cabecera.php';
                     <?php endif; ?>
 
                     <?php
-                    $comentarios2 = mysqli_query($conexion,
+                    //cargo los comentarios ordenados por fecha (los más recientes primero) junto con el nombre del usuario que lo ha escrito
+                    $comentarios = mysqli_query($conexion,
                         "SELECT c.*, u.username FROM comentarios c
                          JOIN usuarios u ON c.id_usuario = u.id_usuario
                          WHERE c.id_evento = $id ORDER BY c.fecha DESC"
                     );
                     ?>
-                    <?php if (mysqli_num_rows($comentarios2) > 0): ?>
-                        <?php while ($com = mysqli_fetch_assoc($comentarios2)): ?>
+                    <?php if (mysqli_num_rows($comentarios) > 0): ?>
+                        <?php while ($com = mysqli_fetch_assoc($comentarios)): ?>
                         <div class="comentario">
                             <div class="comentario-header">
                                 <strong><?= htmlspecialchars($com['username']) ?></strong>
@@ -370,24 +374,13 @@ include 'includes/cabecera.php';
                 </div>
             </div>
 
-            <!-- Sidebar -->
-            <div class="evento-sidebar">
+            <!-- Columna lateral -->
+            <div class="evento-lateral">
 
                 <!-- Inscripción -->
-                <div class="sidebar-card">
+                <div class="lateral-card">
                     <h4>Inscripción</h4>
                     <div class="barra-plazas">
-                        <?php
-                        /* Color de la barra según ocupación:
-                           verde < 50%, ámbar 50-80%, rojo > 80% */
-                        if ($pct < 50) {
-                            $color_barra = '#27AE60';
-                        } elseif ($pct < 80) {
-                            $color_barra = '#B7770D';
-                        } else {
-                            $color_barra = '#C0392B';
-                        }
-                        ?>
                         <div class="barra-fill" style="width:<?= $pct ?>%; background:<?= $color_barra ?>"></div>
                     </div>
                     <p class="plazas-texto <?= $pct < 50 ? 'estado-activo' : ($pct < 80 ? 'estado-pendiente' : 'estado-bloqueado') ?>">
@@ -420,7 +413,7 @@ include 'includes/cabecera.php';
                                 Apuntarse
                             </button>
                             <?php if (!empty($tipos_admitidos) || !empty($marcas_admitidas)): ?>
-                                <button class="btn-outline btn-full" style="margin-top:8px;"
+                                <button class="btn-secundario btn-full" style="margin-top:8px;"
                                         onclick="abrirModal('modal-mensaje')">
                                     <i class="fa-regular fa-envelope"></i> Mi coche no cumple los requisitos
                                 </button>
@@ -434,11 +427,11 @@ include 'includes/cabecera.php';
                 </div>
 
                 <!-- Organizador -->
-                <div class="sidebar-card">
+                <div class="lateral-card">
                     <h4>Organizador</h4>
                     <p><?= htmlspecialchars($evento['org_nombre']) ?> (@<?= htmlspecialchars($evento['username']) ?>)</p>
                     <?php if (isset($_SESSION['usuario']) && $_SESSION['usuario'] != $evento['org_id']): ?>
-                        <button class="btn-outline btn-full" style="margin-top:10px;"
+                        <button class="btn-secundario btn-full" style="margin-top:10px;"
                                 onclick="abrirModal('modal-mensaje')">
                             <i class="fa-regular fa-envelope"></i> Contactar
                         </button>
@@ -446,7 +439,7 @@ include 'includes/cabecera.php';
                 </div>
 
                 <!-- Asistentes -->
-                <div class="sidebar-card">
+                <div class="lateral-card">
                     <h4>Asistentes (<?= $inscritos ?>)</h4>
 
                     <!-- Inscripción manual por organizador -->
@@ -458,7 +451,7 @@ include 'includes/cabecera.php';
                     <?php endif; ?>
 
                     <?php
-                    $asistentes2 = mysqli_query($conexion,
+                    $asistentes = mysqli_query($conexion,
                         "SELECT DISTINCT u.id_usuario, u.username, v.marca, v.modelo, v.tipo_vehiculo
                          FROM inscripciones i
                          JOIN usuarios u ON i.id_usuario = u.id_usuario
@@ -466,9 +459,9 @@ include 'includes/cabecera.php';
                          WHERE i.id_evento = $id"
                     );
                     ?>
-                    <?php if (mysqli_num_rows($asistentes2) > 0): ?>
+                    <?php if (mysqli_num_rows($asistentes) > 0): ?>
                         <ul class="lista-asistentes">
-                            <?php while ($a = mysqli_fetch_assoc($asistentes2)): ?>
+                            <?php while ($a = mysqli_fetch_assoc($asistentes)): ?>
                             <li>
                                 <div>
                                     <strong><?= htmlspecialchars($a['username']) ?></strong>
@@ -489,9 +482,9 @@ include 'includes/cabecera.php';
                     <?php endif; ?>
                 </div>
 
-                <!-- Mapa de ruta -->
+                <!-- Mapa de ruta (para eventos de tipo ruta) -->
                 <?php if ($evento['tipo_evento'] === 'ruta' && !empty($evento['salida']) && !empty($evento['destino'])): ?>
-                <div class="sidebar-card">
+                <div class="lateral-card">
                     <h4><i class="fa-solid fa-route"></i> Ruta</h4>
                     <p class="tipos-admitidos-label">
                         <i class="fa-solid fa-circle-dot" style="color:#C0392B"></i>
@@ -665,7 +658,7 @@ function cargarVehiculos(idUsuario) {
         return;
     }
 
-    /* Hacemos una petición a un endpoint sencillo */
+    /* Hacer petición AJAX para obtener los vehículos del usuario */
     fetch('/revhub/get_vehiculos.php?id_usuario=' + idUsuario)
         .then(function(r) { return r.json(); })
         .then(function(vehiculos) {
@@ -695,14 +688,14 @@ function cargarVehiculos(idUsuario) {
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-/* Geocodificar y trazar ruta con OSRM incluyendo puntos intermedios */
+/* Geocodificar y trazar ruta incluyendo puntos intermedios */
 var salida   = <?= json_encode($evento['salida']) ?>;
 var destino  = <?= json_encode($evento['destino']) ?>;
-var puntosRaw = <?= json_encode($evento['puntos_intermedios'] ?? '') ?>;
+var puntos = <?= json_encode($evento['puntos_intermedios'] ?? '') ?>;
 
-/* Parsear puntos intermedios separados por ; */
-var puntosIntermedios = puntosRaw
-    ? puntosRaw.split(';').map(function(p) { return p.trim(); }).filter(function(p) { return p.length > 0; })
+/* Separar puntos intermedios */
+var puntosIntermedios = puntos
+    ? puntos.split(';').map(function(p) { return p.trim(); }).filter(function(p) { return p.length > 0; })
     : [];
 
 function geocodificar(lugar) {
@@ -727,33 +720,33 @@ Promise.all(todosLugares.map(geocodificar)).then(function(coords) {
         attribution: '© OpenStreetMap'
     }).addTo(mapa);
 
-    /* Icono verde para salida */
-    var iconoVerde = L.divIcon({
+    /* Icono para salida */
+    var iconoSalida = L.divIcon({
         html: '<div style="background:#27AE60;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);"></div>',
         className: '', iconAnchor: [7, 7]
     });
-    /* Icono rojo para destino */
-    var iconoRojo = L.divIcon({
+    /* Icono para destino */
+    var iconoDestino = L.divIcon({
         html: '<div style="background:#C0392B;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);"></div>',
         className: '', iconAnchor: [7, 7]
     });
-    /* Icono gris para puntos intermedios */
-    var iconoGris = L.divIcon({
+    /* Icono para puntos intermedios */
+    var iconoIntermedio = L.divIcon({
         html: '<div style="background:#8E8E93;width:10px;height:10px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);"></div>',
         className: '', iconAnchor: [5, 5]
     });
 
-    L.marker(puntoSalida,  { icon: iconoVerde }).addTo(mapa).bindPopup('Salida: ' + salida);
-    L.marker(puntoDestino, { icon: iconoRojo  }).addTo(mapa).bindPopup('Destino: ' + destino);
+    L.marker(puntoSalida,  { icon: iconoSalida }).addTo(mapa).bindPopup('Salida: ' + salida);
+    L.marker(puntoDestino, { icon: iconoDestino  }).addTo(mapa).bindPopup('Destino: ' + destino);
 
     /* Marcadores para puntos intermedios */
     for (var i = 1; i < coords.length - 1; i++) {
-        L.marker(coords[i], { icon: iconoGris })
+        L.marker(coords[i], { icon: iconoIntermedio })
             .addTo(mapa)
             .bindPopup('Parada: ' + puntosIntermedios[i - 1]);
     }
 
-    /* Construir URL de OSRM con todos los puntos */
+    /* Construir URL con todos los puntos */
     var waypoints = coords.map(function(c) { return c[1] + ',' + c[0]; }).join(';');
     var url = 'https://router.project-osrm.org/route/v1/driving/' + waypoints
         + '?overview=full&geometries=geojson';
@@ -764,10 +757,11 @@ Promise.all(todosLugares.map(geocodificar)).then(function(coords) {
                 style: { color: '#C0392B', weight: 4, opacity: 0.8 }
             }).addTo(mapa);
 
+            /* Ajustar vista para mostrar toda la ruta */
             var bounds = L.geoJSON(data.routes[0].geometry).getBounds();
             mapa.fitBounds(bounds, { padding: [20, 20] });
 
-            /* Mostrar distancia total */
+            /* Mostrar distancia total en km */
             var km = Math.round(data.routes[0].distance / 1000);
             var kmTexto = document.getElementById('km-texto');
             if (kmTexto) {

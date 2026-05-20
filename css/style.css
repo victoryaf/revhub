@@ -197,7 +197,7 @@ footer {
     display: block;
 }
 
-.btn-outline {
+.btn-secundario {
     display: inline-block;
     background: transparent;
     color: #1C1C1E;
@@ -210,7 +210,7 @@ footer {
     cursor: pointer;
 }
 
-.btn-outline:hover {
+.btn-secundario:hover {
     border-color: #8E8E93;
 }
 
@@ -412,9 +412,9 @@ footer {
 }
 
 /* ============================================================
-   BADGES
+   ETIQUETAS
    ============================================================ */
-.badge {
+.etiqueta {
     display: inline-block;
     font-size: 10px;
     font-weight: 500;
@@ -425,11 +425,11 @@ footer {
     letter-spacing: 0.06em;
 }
 
-.badge-quedada     { background: #C0392B; color: #fff; }
-.badge-ruta        { background: #27AE60; color: #fff; }
-.badge-exposicion  { background: #2980B9; color: #fff; }
-.badge-competicion { background: #8E44AD; color: #fff; }
-.badge-otro        { background: #8E8E93; color: #fff; }
+.etiqueta-quedada     { background: #C0392B; color: #fff; }
+.etiqueta-ruta        { background: #27AE60; color: #fff; }
+.etiqueta-exposicion  { background: #2980B9; color: #fff; }
+.etiqueta-competicion { background: #8E44AD; color: #fff; }
+.etiqueta-otro        { background: #8E8E93; color: #fff; }
 
 /* ============================================================
    ESTADOS
@@ -742,8 +742,8 @@ footer {
     color: #C0392B;
 }
 
-/* Sidebar */
-.sidebar-card {
+/* Lateral */
+.lateral-card {
     background: #fff;
     border: 1px solid #E5E5EA;
     border-radius: 8px;
@@ -751,7 +751,7 @@ footer {
     margin-bottom: 16px;
 }
 
-.sidebar-card h4 {
+.lateral-card h4 {
     font-size: 14px;
     font-weight: 500;
     margin-bottom: 12px;
@@ -759,7 +759,7 @@ footer {
     border-bottom: 1px solid #E5E5EA;
 }
 
-.sidebar-card p {
+.lateral-card p {
     font-size: 13px;
     color: #636366;
 }
@@ -982,7 +982,7 @@ footer {
     align-items: start;
 }
 
-.perfil-sidebar .sidebar-card {
+.perfil-lateral .lateral-card {
     text-align: center;
 }
 
@@ -1062,7 +1062,7 @@ footer {
     gap: 16px;
 }
 
-.perfil-main .sidebar-card h3 {
+.perfil-main .lateral-card h3 {
     font-size: 15px;
     font-weight: 500;
     margin-bottom: 14px;
@@ -1070,8 +1070,8 @@ footer {
     border-bottom: 1px solid #E5E5EA;
 }
 
-/* Badge rol */
-.badge-rol {
+/* Etiqueta rol */
+.etiqueta-rol {
     font-size: 10px;
     font-weight: 500;
     padding: 2px 8px;
@@ -1082,9 +1082,9 @@ footer {
     margin-bottom: 4px;
 }
 
-.badge-usuario      { background: #F5F5F0;  color: #636366; border: 1px solid #E5E5EA; }
-.badge-organizador  { background: #EAFAF1;  color: #27AE60; border: 1px solid #A9DFBF; }
-.badge-admin        { background: #FDEDEC;  color: #922B21; border: 1px solid #F5B7B1; }
+.etiqueta-usuario      { background: #F5F5F0;  color: #636366; border: 1px solid #E5E5EA; }
+.etiqueta-organizador  { background: #EAFAF1;  color: #27AE60; border: 1px solid #A9DFBF; }
+.etiqueta-admin        { background: #FDEDEC;  color: #922B21; border: 1px solid #F5B7B1; }
 
 /* Lista vehículos en perfil */
 .lista-vehiculos {
@@ -1271,7 +1271,7 @@ footer {
     color: #8E8E93;
 }
 
-.sidebar-card h3 {
+.lateral-card h3 {
     font-size: 15px;
     font-weight: 500;
     margin-bottom: 14px;
@@ -1321,8 +1321,8 @@ footer {
     color: #922B21;
 }
 
-/* Badge tipo admitido */
-.badge-tipo-admitido {
+/* Etiqueta tipo admitido */
+.etiqueta-tipo-admitido {
     background: #F5F5F0;
     color: #636366;
     border: 1px solid #E5E5EA;
@@ -1337,7 +1337,7 @@ footer {
     margin-bottom: 4px;
 }
 
-/* Tipos admitidos en sidebar */
+/* Tipos admitidos en barra lateral */
 .tipos-admitidos-label {
     display: flex;
     align-items: center;
@@ -1470,8 +1470,8 @@ footer {
     color: #fff;
 }
 
-/* Badge restricción en tarjeta */
-.badge-restriccion {
+/* Etiqueta restricción en tarjeta */
+.etiqueta-restriccion {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -1503,7 +1503,7 @@ footer {
     gap: 8px;
 }
 
-.badge-opcional {
+.etiqueta-opcional {
     font-size: 10px;
     font-weight: 500;
     background: #EBF5FB;
@@ -1581,7 +1581,7 @@ footer {
     gap: 4px;
 }
 
-.badge-nuevo {
+.etiqueta-nuevo {
     font-size: 10px;
     font-weight: 500;
     background: #B7770D;
@@ -1592,8 +1592,8 @@ footer {
     vertical-align: middle;
 }
 
-/* Evento badges en línea */
-.evento-badges {
+/* Evento etiquetas en línea */
+.evento-etiqueta {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
@@ -1615,8 +1615,8 @@ footer {
     line-height: 1.8;
 }
 
-/* Badges en tarjeta evento */
-.tarjeta-badges {
+/* Etiquetas en tarjeta evento */
+.tarjeta-etiquetas {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;

@@ -2,6 +2,7 @@
 include 'includes/cabecera.php';
 include 'php/conexion.php';
 
+// si no esta logueado redirijo al inicio
 if (!isset($_SESSION['usuario'])) {
     header('Location: /revhub/index.php');
     exit;
@@ -24,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
         $apellidos_e   = mysqli_real_escape_string($conexion, $apellidos);
         $descripcion_e = mysqli_real_escape_string($conexion, $descripcion);
 
+        // subir foto de perfil si se ha enviado una
         $foto_sql = '';
         if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === 0) {
             $extension  = strtolower(pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION));
@@ -62,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
     $texto_r   = trim($_POST['texto_respuesta']);
 
     if (empty($texto_r)) {
+        // para volver a abrir el modal con el mensaje de error necesito recuperar el username del destinatario
         $dest_u = mysqli_fetch_assoc(mysqli_query($conexion,
             "SELECT username FROM usuarios WHERE id_usuario = $id_dest"
         ));
@@ -120,6 +123,7 @@ $mensajes = mysqli_query($conexion,
      ORDER BY m.fecha DESC"
 );
 
+/* --- Número de mensajes nuevos --- */
 $num_mensajes_nuevos = mysqli_fetch_assoc(mysqli_query($conexion,
     "SELECT COUNT(*) as total FROM mensajes
      WHERE id_destinatario = $id_usuario AND leido = 0"
@@ -143,9 +147,9 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion,
 
         <div class="perfil-layout">
 
-            <!-- Sidebar -->
-            <div class="perfil-sidebar">
-                <div class="sidebar-card">
+            <!-- Lateral -->
+            <div class="perfil-lateral">
+                <div class="lateral-card">
                     <div class="perfil-avatar">
                         <?php if ($usuario['foto_perfil']): ?>
                             <img src="/revhub/img/perfiles/<?= htmlspecialchars($usuario['foto_perfil']) ?>"
@@ -159,7 +163,7 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion,
                         <?= htmlspecialchars($usuario['apellidos']) ?>
                     </h2>
                     <p class="perfil-username">@<?= htmlspecialchars($usuario['username']) ?></p>
-                    <span class="badge-rol badge-<?= $usuario['rol'] ?>"><?= $usuario['rol'] ?></span>
+                    <span class="etiqueta-rol etiqueta-<?= $usuario['rol'] ?>"><?= $usuario['rol'] ?></span>
 
                     <?php if ($usuario['descripcion']): ?>
                         <p class="perfil-desc"><?= htmlspecialchars($usuario['descripcion']) ?></p>
@@ -189,16 +193,16 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion,
                 </div>
             </div>
 
-            <!-- Contenido -->
+            <!-- Contenido principal -->
             <div class="perfil-main">
 
                 <!-- Mensajes -->
-                <div class="sidebar-card">
+                <div class="lateral-card">
                     <div class="seccion-header">
                         <h3>
                             <i class="fa-regular fa-envelope"></i> Mensajes
                             <?php if ($num_mensajes_nuevos > 0): ?>
-                                <span class="badge-nuevo">
+                                <span class="etiqueta-nuevo">
                                     <?= $num_mensajes_nuevos ?> nuevo<?= $num_mensajes_nuevos > 1 ? 's' : '' ?>
                                 </span>
                             <?php endif; ?>
@@ -259,7 +263,7 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion,
                 </div>
 
                 <!-- Mis vehículos -->
-                <div class="sidebar-card">
+                <div class="lateral-card">
                     <div class="seccion-header">
                         <h3><i class="fa-solid fa-car"></i> Mis vehículos</h3>
                         <a href="/revhub/vehiculos.php" class="btn-accion">Gestionar</a>
@@ -294,8 +298,8 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion,
                     <?php endif; ?>
                 </div>
 
-                <!-- Historial -->
-                <div class="sidebar-card">
+                <!-- Historial de eventos en los que he participado -->
+                <div class="lateral-card">
                     <h3><i class="fa-regular fa-calendar"></i> Historial de eventos</h3>
                     <?php
                     $historial = mysqli_query($conexion,
@@ -326,7 +330,7 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion,
                                     </p>
                                 </div>
                                 <a href="/revhub/evento.php?id=<?= $h['id_evento'] ?>"
-                                   class="badge badge-<?= $h['tipo_evento'] ?>">
+                                   class="etiqueta etiqueta-<?= $h['tipo_evento'] ?>">
                                     <?= $h['tipo_evento'] ?>
                                 </a>
                             </li>
@@ -339,7 +343,7 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion,
 
                 <!-- Eventos organizados -->
                 <?php if ($usuario['rol'] === 'organizador' || $usuario['rol'] === 'admin'): ?>
-                <div class="sidebar-card">
+                <div class="lateral-card">
                     <div class="seccion-header">
                         <h3><i class="fa-solid fa-star"></i> Eventos que organizo</h3>
                         <a href="/revhub/crear_evento.php" class="btn-accion">
@@ -381,7 +385,7 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion,
     </div>
 </main>
 
-<!-- ===== MODAL RESPONDER ===== -->
+<!--  MODAL RESPONDER  -->
 <div class="modal-overlay" id="modal-responder"
      <?= $responder_msg ? 'style="display:flex;"' : '' ?>>
     <div class="modal">
@@ -413,7 +417,7 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion,
     </div>
 </div>
 
-<!-- ===== MODAL EDITAR PERFIL ===== -->
+<!--  MODAL EDITAR PERFIL  -->
 <div class="modal-overlay" id="modal-editar-perfil">
     <div class="modal modal-grande">
         <button class="modal-cerrar" onclick="cerrarModal('modal-editar-perfil')">&times;</button>
@@ -457,6 +461,8 @@ $num_eventos_org = mysqli_fetch_assoc(mysqli_query($conexion,
 </div>
 
 <script>
+
+//relleno los campos del modal responder con los datos del mensaje al que se responde
 function abrirResponder(idDestinatario, username, idEvento) {
     document.getElementById('input-destinatario').value = idDestinatario;
     document.getElementById('input-evento-r').value     = idEvento || '';

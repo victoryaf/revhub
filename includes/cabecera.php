@@ -1,8 +1,10 @@
 <?php
+// inicio la sesion si no esta ya iniciada
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// proceso el login del modal
 $error_login = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['accion'] === 'login') {
@@ -11,10 +13,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
     $email    = trim($_POST['email']);
     $password = $_POST['password'];
 
+    // compruebo que no esten vacios
     if (empty($email) || empty($password)) {
         $error_login = 'Introduce el email o usuario y la contraseña.';
     } else {
         $email_esc = mysqli_real_escape_string($conexion, $email);
+
+        // busco por email o por nombre de usuario
         $resultado = mysqli_query($conexion,
             "SELECT * FROM usuarios WHERE email = '$email_esc' OR username = '$email_esc'"
         );
@@ -22,15 +27,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
         if (mysqli_num_rows($resultado) === 1) {
             $usuario = mysqli_fetch_assoc($resultado);
 
+            // verifico la contraseña
             if (password_verify($password, $usuario['contrasena'])) {
+
+                // si esta bloqueado no puede entrar
                 if ($usuario['rol'] === 'bloqueado') {
                     $error_login = 'Tu cuenta ha sido bloqueada. Contacta con el administrador.';
                 } else {
+                    // guardo sus datos en sesion
                     $_SESSION['usuario']  = $usuario['id_usuario'];
                     $_SESSION['username'] = $usuario['username'];
                     $_SESSION['nombre']   = $usuario['nombre'];
                     $_SESSION['rol']      = $usuario['rol'];
-
+                    //redirijo a la misma pagina
                     $url = strtok($_SERVER['REQUEST_URI'], '?');
                     header('Location: ' . $url);
                     exit;
@@ -152,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
         </div>
 </header>
 
-<!-- ===== MODAL LOGIN ===== -->
+<!--  MODAL LOGIN  -->
 <div class="modal-overlay" id="modal-login"
      <?= ($error_login || isset($_GET['login'])) ? 'style="display:flex;"' : '' ?>>
     <div class="modal">

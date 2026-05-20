@@ -2,6 +2,7 @@
 include 'includes/cabecera.php';
 include 'php/conexion.php';
 
+//solo usuarios registrados pueden acceder a esta pagina
 if (!isset($_SESSION['usuario'])) {
     header('Location: /revhub/index.php');
     exit;
@@ -18,6 +19,7 @@ if (isset($_GET['eliminar']) && is_numeric($_GET['eliminar'])) {
         "SELECT id_vehiculo FROM vehiculos WHERE id_vehiculo = $id_v AND id_usuario = $id_usuario"
     );
     if (mysqli_num_rows($check) > 0) {
+        //borro la imagen si existe y el vehículo de la base de datos
         $img = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT imagen FROM vehiculos WHERE id_vehiculo = $id_v"));
         if ($img['imagen']) {
             $ruta = $_SERVER['DOCUMENT_ROOT'] . '/revhub/img/vehiculos/' . $img['imagen'];
@@ -38,7 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
     $matricula      = trim($_POST['matricula']);
     $descripcion    = trim($_POST['descripcion']);
     $modificaciones = trim($_POST['modificaciones']);
-
+    
+    //compruebo que los campos obligatorios no esten vacios
     if (empty($marca) || empty($modelo) || empty($anio) || empty($color) || empty($tipos) || empty($matricula)) {
         $error = 'Los campos marca, modelo, año, color, tipo y matrícula son obligatorios.';
     } else {
@@ -51,10 +54,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
         $desc_e   = mysqli_real_escape_string($conexion, $descripcion);
         $mods_e   = mysqli_real_escape_string($conexion, $modificaciones);
 
+        //la matrícula debe ser única, compruebo que no exista ya otra igual
         $check_m = mysqli_query($conexion, "SELECT id_vehiculo FROM vehiculos WHERE matricula = '$mat_e'");
         if (mysqli_num_rows($check_m) > 0) {
             $error = 'Ya existe un vehículo con esa matrícula.';
         } else {
+            //subida de imagen (opcional)
             $img_sql = 'NULL';
             if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === 0) {
                 $ext  = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));
@@ -124,6 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['
         if (mysqli_num_rows($check_m) > 0) {
             $error = 'Ya existe otro vehículo con esa matrícula.';
         } else {
+            //subida de imagen (opcional)
             $img_sql = '';
             if (isset($_FILES['imagen_editar']) && $_FILES['imagen_editar']['error'] === 0) {
                 $ext  = strtolower(pathinfo($_FILES['imagen_editar']['name'], PATHINFO_EXTENSION));
@@ -162,7 +168,7 @@ if (isset($_GET['editar']) && is_numeric($_GET['editar'])) {
         $vehiculo_editar = mysqli_fetch_assoc($res);
     }
 }
-
+//cargar vehículos del usuario para mostrarlos en la página
 $vehiculos = mysqli_query($conexion,
     "SELECT * FROM vehiculos WHERE id_usuario = $id_usuario ORDER BY marca ASC"
 );
@@ -194,6 +200,7 @@ $marcas_disponibles = [
             <div class="vehiculos-grid">
                 <?php while ($v = mysqli_fetch_assoc($vehiculos)): ?>
                 <div class="tarjeta-vehiculo">
+                    <!-- foto del vehículo o icono genérico -->
                     <div class="vehiculo-cabecera">
                         <?php if ($v['imagen']): ?>
                             <img src="/revhub/img/vehiculos/<?= htmlspecialchars($v['imagen']) ?>"
@@ -202,6 +209,7 @@ $marcas_disponibles = [
                             <i class="fa-solid fa-car"></i>
                         <?php endif; ?>
                     </div>
+                    <!-- datos del vehículo -->
                     <div class="vehiculo-cuerpo">
                         <h3><?= htmlspecialchars($v['marca']) ?> <?= htmlspecialchars($v['modelo']) ?></h3>
                         <div class="vehiculo-datos">
@@ -229,9 +237,10 @@ $marcas_disponibles = [
                             <p class="vehiculo-descripcion"><strong>Modificaciones:</strong> <?= htmlspecialchars($v['modificaciones']) ?></p>
                         <?php endif; ?>
                     </div>
+                    <!-- botones de editar y eliminar -->
                     <div class="vehiculo-pie">
                         <a href="/revhub/vehiculos.php?editar=<?= $v['id_vehiculo'] ?>"
-                           class="btn-outline btn-sm">
+                           class="btn-secundario btn-sm">
                             <i class="fa-solid fa-pen"></i> Editar
                         </a>
                         <a href="/revhub/vehiculos.php?eliminar=<?= $v['id_vehiculo'] ?>"
