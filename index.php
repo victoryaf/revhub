@@ -37,6 +37,11 @@
                     <?php if ($evento['cartel']): ?>
                         <img src="/revhub/img/eventos/<?= htmlspecialchars($evento['cartel']) ?>"
                              alt="<?= htmlspecialchars($evento['nombre']) ?>">
+                    <?php elseif ($evento['tipo_evento'] === 'ruta'): ?>
+                        <div class="tarjeta-imagen-ruta">
+                            <i class="fa-solid fa-route"></i>
+                            <span>Ruta</span>
+                        </div>
                     <?php else: ?>
                         <span>Sin imagen</span>
                     <?php endif; ?>

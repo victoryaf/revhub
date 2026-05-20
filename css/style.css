@@ -31,6 +31,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
 }
 
 a {
@@ -1679,10 +1680,6 @@ footer {
 /* ============================================================
    MENÚ MÓVIL
    ============================================================ */
-
-/* ============================================================
-   MENÚ MÓVIL
-   ============================================================ */
 .nav-escritorio {
     display: flex;
     gap: 20px;
@@ -1763,4 +1760,21 @@ footer {
 
 .modal-overlay {
     z-index: 200;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1C1C1E;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3A3A3C;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #C0392B;
 }

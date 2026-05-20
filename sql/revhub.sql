@@ -131,11 +131,11 @@ INSERT INTO vehiculos (id_usuario, marca, modelo, anio, color, tipo_vehiculo, ma
 (5, 'Kawasaki', 'Z900',      2021, 'Negro',   'moto',      'MA-9988-A', 'Naked sport, escape Akrapovic'),
 (1, 'SEAT',     'Ibiza',     2005, 'Azul',    'tuning',    'LU-7712-F', 'Preparación motorsport');
 
-INSERT INTO eventos (id_usuario, nombre, descripcion, fecha, hora, ubicacion, max_participantes, tipo_evento) VALUES
-(2, 'Quedada Clásicos Valdeorras 2026', 'Encuentro de vehículos clásicos en Petín.',      '2026-06-15', '10:00:00', 'Petín, Ourense',    50, 'quedada'),
-(2, 'Ruta Motera Galicia 2026',         'Ruta de motos por la costa gallega.',             '2026-06-22', '09:00:00', 'A Coruña → Santiago', 40, 'ruta'),
-(1, 'Exposición Tuning Vigo 2026',      'Exposición de vehículos tuning en Vigo.',         '2026-07-05', '11:00:00', 'Vigo, Pontevedra',  70, 'exposicion'),
-(2, 'Concentración Deportivos Ferrol',  'Concentración de coches deportivos en Ferrol.',   '2026-07-20', '10:00:00', 'Ferrol, A Coruña',  60, 'quedada');
+INSERT INTO eventos (id_usuario, nombre, descripcion, fecha, hora, ubicacion, max_participantes, tipo_evento, tipos_admitidos, marcas_admitidas, salida, destino, puntos_intermedios, cartel) VALUES
+(2, 'Quedada Clásicos Valdeorras 2026', 'Encuentro de vehículos clásicos en Petín.',      '2026-06-15', '10:00:00', 'Petín, Ourense',      50, 'quedada',   NULL, NULL, NULL, NULL, NULL, 'PetinPiston.png'),
+(2, 'Ruta Motera Galicia 2026',         'Ruta de motos por la costa gallega.',             '2026-06-22', '09:00:00', 'A Coruña → Santiago', 40, 'ruta',      NULL, NULL, 'A Coruña, España', 'Santiago de Compostela, España', NULL, NULL),
+(1, 'Exposición Tuning Vigo 2026',      'Exposición de vehículos tuning en Vigo.',         '2026-07-05', '11:00:00', 'Vigo, Pontevedra',    70, 'exposicion', NULL, NULL, NULL, NULL, NULL, 'expotuning.png'),
+(2, 'Concentración Deportivos Ferrol',  'Concentración de coches deportivos en Ferrol.',   '2026-07-20', '10:00:00', 'Ferrol, A Coruña',    60, 'quedada',   NULL, NULL, NULL, NULL, NULL, 'deportivos.png');
 
 INSERT INTO inscripciones (id_usuario, id_evento, id_vehiculo) VALUES
 (2, 1, 1),

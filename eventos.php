@@ -9,7 +9,7 @@ include 'php/conexion.php';
             <h2>Eventos</h2>
         </div>
 
-        <!-- Filtros de búsqueda -->
+        <!-- Filtros -->
         <form method="GET" action="" class="filtros">
             <?php if (isset($_GET['mis_coches'])): ?>
                 <input type="hidden" name="mis_coches" value="1">
@@ -36,13 +36,12 @@ include 'php/conexion.php';
         <?php if (isset($_SESSION['usuario'])): ?>
         <div class="filtros-chips">
             <?php
-            /* Construir URLs conservando tipo y buscar */
             $params_base = [];
             if (!empty($_GET['tipo']))   $params_base['tipo']   = $_GET['tipo'];
             if (!empty($_GET['buscar'])) $params_base['buscar'] = $_GET['buscar'];
 
-            $url_todos     = '/revhub/eventos.php' . (!empty($params_base) ? '?' . http_build_query($params_base) : '');
-            $url_mis_coches= '/revhub/eventos.php?' . http_build_query(array_merge($params_base, ['mis_coches' => '1']));
+            $url_todos      = '/revhub/eventos.php' . (!empty($params_base) ? '?' . http_build_query($params_base) : '');
+            $url_mis_coches = '/revhub/eventos.php?' . http_build_query(array_merge($params_base, ['mis_coches' => '1']));
             ?>
             <a href="<?= $url_todos ?>"
                class="chip <?= !isset($_GET['mis_coches']) ? 'chip-activo' : '' ?>">
@@ -56,7 +55,6 @@ include 'php/conexion.php';
         <?php endif; ?>
 
         <?php
-        /* --- Construir query --- */
         $where = "WHERE fecha >= CURDATE()";
 
         if (!empty($_GET['tipo'])) {
@@ -69,16 +67,15 @@ include 'php/conexion.php';
             $where .= " AND (nombre LIKE '%$buscar%' OR ubicacion LIKE '%$buscar%')";
         }
 
-        $resultado = mysqli_query($conexion, "SELECT * FROM eventos $where ORDER BY fecha ASC");
+        $resultado     = mysqli_query($conexion, "SELECT * FROM eventos $where ORDER BY fecha ASC");
         $eventos_todos = [];
         while ($ev = mysqli_fetch_assoc($resultado)) {
             $eventos_todos[] = $ev;
         }
 
-        /* --- Filtro mis coches --- */
+        /* Filtro mis coches */
         if (isset($_GET['mis_coches']) && isset($_SESSION['usuario'])) {
-            $uid = $_SESSION['usuario'];
-
+            $uid   = $_SESSION['usuario'];
             $mis_v = mysqli_query($conexion,
                 "SELECT marca, tipo_vehiculo FROM vehiculos WHERE id_usuario = $uid"
             );
@@ -93,13 +90,11 @@ include 'php/conexion.php';
             }
 
             $eventos_todos = array_filter($eventos_todos, function($ev) use ($mis_marcas, $mis_tipos) {
-                /* Comprobar tipos */
                 if (!empty($ev['tipos_admitidos'])) {
                     $tipos_ev = array_map(function($t){ return strtolower(trim($t)); },
                         explode(',', $ev['tipos_admitidos']));
                     if (empty(array_intersect($mis_tipos, $tipos_ev))) return false;
                 }
-                /* Comprobar marcas */
                 if (!empty($ev['marcas_admitidas'])) {
                     $marcas_ev = array_map(function($m){ return strtolower(trim($m)); },
                         explode(',', $ev['marcas_admitidas']));
@@ -124,6 +119,11 @@ include 'php/conexion.php';
                     <?php if ($evento['cartel']): ?>
                         <img src="/revhub/img/eventos/<?= htmlspecialchars($evento['cartel']) ?>"
                              alt="<?= htmlspecialchars($evento['nombre']) ?>">
+                    <?php elseif ($evento['tipo_evento'] === 'ruta'): ?>
+                        <div class="tarjeta-imagen-ruta">
+                            <i class="fa-solid fa-route"></i>
+                            <span>Ruta</span>
+                        </div>
                     <?php else: ?>
                         <span>Sin imagen</span>
                     <?php endif; ?>
@@ -173,7 +173,6 @@ include 'php/conexion.php';
                 <?php endif; ?>
             </p>
         <?php endif; ?>
-
     </div>
 </main>
 
