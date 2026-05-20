@@ -40,18 +40,19 @@ $marcas_disponibles = [
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre            = trim($_POST['nombre']);
-    $descripcion       = trim($_POST['descripcion']);
-    $fecha             = trim($_POST['fecha']);
-    $hora              = trim($_POST['hora']);
-    $ubicacion         = trim($_POST['ubicacion']);
-    $salida            = trim($_POST['salida'] ?? '');
-    $destino           = trim($_POST['destino'] ?? '');
-    $puntos_intermedios= trim($_POST['puntos_intermedios'] ?? '');
-    $max_participantes = trim($_POST['max_participantes']);
-    $tipo_evento       = trim($_POST['tipo_evento']);
-    $tipos_admitidos   = isset($_POST['tipos_admitidos'])  ? implode(',', $_POST['tipos_admitidos'])  : '';
-    $marcas_admitidas  = isset($_POST['marcas_admitidas']) ? implode(',', $_POST['marcas_admitidas']) : '';
+    $nombre                   = trim($_POST['nombre']);
+    $descripcion              = trim($_POST['descripcion']);
+    $fecha                    = trim($_POST['fecha']);
+    $hora                     = trim($_POST['hora']);
+    $ubicacion                = trim($_POST['ubicacion']);
+    $salida                   = trim($_POST['salida'] ?? '');
+    $destino                  = trim($_POST['destino'] ?? '');
+    $puntos_intermedios       = trim($_POST['puntos_intermedios'] ?? '');
+    $max_participantes        = trim($_POST['max_participantes']);
+    $tipo_evento              = trim($_POST['tipo_evento']);
+    $fecha_limite_inscripcion = trim($_POST['fecha_limite_inscripcion'] ?? '');
+    $tipos_admitidos          = isset($_POST['tipos_admitidos'])  ? implode(',', $_POST['tipos_admitidos'])  : '';
+    $marcas_admitidas         = isset($_POST['marcas_admitidas']) ? implode(',', $_POST['marcas_admitidas']) : '';
 
     if (empty($nombre) || empty($fecha) || empty($hora) || empty($ubicacion) || empty($max_participantes) || empty($tipo_evento)) {
         $error = 'Todos los campos excepto descripción, cartel y filtros son obligatorios.';
@@ -68,10 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tipo_e    = mysqli_real_escape_string($conexion, $tipo_evento);
         $tipos_e   = mysqli_real_escape_string($conexion, $tipos_admitidos);
         $marcas_e  = mysqli_real_escape_string($conexion, $marcas_admitidas);
+        $plazo_e   = mysqli_real_escape_string($conexion, $fecha_limite_inscripcion);
 
-        $salida_sql  = $salida  ? "'$salida_e'"  : 'NULL';
-        $destino_sql = $destino ? "'$destino_e'" : 'NULL';
-        $puntos_sql  = $puntos_intermedios ? "'$puntos_e'" : 'NULL';
+        $salida_sql  = $salida               ? "'$salida_e'"  : 'NULL';
+        $destino_sql = $destino              ? "'$destino_e'" : 'NULL';
+        $puntos_sql  = $puntos_intermedios   ? "'$puntos_e'"  : 'NULL';
+        $plazo_sql   = $fecha_limite_inscripcion ? "'$plazo_e'" : 'NULL';
 
         $cartel_sql = '';
         if (isset($_FILES['cartel']) && $_FILES['cartel']['error'] === 0) {
@@ -96,7 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     hora = '$hora_e', ubicacion = '$ubic_e', salida = $salida_sql,
                     destino = $destino_sql, puntos_intermedios = $puntos_sql,
                     max_participantes = $max_e, tipo_evento = '$tipo_e',
-                    tipos_admitidos = '$tipos_e', marcas_admitidas = '$marcas_e' $cartel_sql
+                    tipos_admitidos = '$tipos_e', marcas_admitidas = '$marcas_e',
+                    fecha_limite_inscripcion = $plazo_sql $cartel_sql
                  WHERE id_evento = $id"
             );
             header("Location: /revhub/evento.php?id=$id");
@@ -138,7 +142,7 @@ include 'includes/cabecera.php';
 
                 <div class="form-2col">
                     <div class="form-group">
-                        <label for="fecha">Fecha</label>
+                        <label for="fecha">Fecha del evento</label>
                         <input type="date" id="fecha" name="fecha"
                                value="<?= htmlspecialchars($evento['fecha']) ?>">
                     </div>
@@ -171,6 +175,13 @@ include 'includes/cabecera.php';
                         <input type="number" id="max_participantes" name="max_participantes"
                                min="1" value="<?= $evento['max_participantes'] ?>">
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="fecha_limite_inscripcion">Plazo límite de inscripción <span class="badge-opcional">Opcional</span></label>
+                    <input type="date" id="fecha_limite_inscripcion" name="fecha_limite_inscripcion"
+                           value="<?= htmlspecialchars($evento['fecha_limite_inscripcion'] ?? '') ?>">
+                    <small class="form-ayuda">Deja vacío si no hay fecha límite. Tras esta fecha no se podrán hacer nuevas inscripciones.</small>
                 </div>
 
                 <div id="campos-ruta" style="display:<?= $evento['tipo_evento'] === 'ruta' ? 'block' : 'none' ?>">

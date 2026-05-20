@@ -1,4 +1,4 @@
-/* ============================================================
+/*
    RevHub — Hoja de estilos global
    Tipografía: Inter (Google Fonts)
    Paleta:
@@ -12,11 +12,11 @@
      Verde       #27AE60 — estado activo
      Ambar       #B7770D — estado pendiente
      Rojo claro  #F9EBEA — boton accion en tarjeta
-   ============================================================ */
+*/
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
 
-/* === RESET === */
+/* RESET  */
 * {
     margin: 0;
     padding: 0;
@@ -48,9 +48,9 @@ main {
     flex: 1;
 }
 
-/* ============================================================
+/* 
    CABECERA
-   ============================================================ */
+*/
 header {
     background: #1C1C1E;
     border-bottom: 2px solid #C0392B;
@@ -131,9 +131,9 @@ nav a:hover {
     color: #fff;
 }
 
-/* ============================================================
+/*
    PIE DE PAGINA
-   ============================================================ */
+*/
 footer {
     background: #1C1C1E;
     border-top: 2px solid #C0392B;
@@ -170,9 +170,9 @@ footer {
     color: #fff;
 }
 
-/* ============================================================
+/*
    BOTONES
-   ============================================================ */
+*/
 .btn {
     display: inline-block;
     background: #C0392B;
@@ -259,18 +259,18 @@ footer {
     text-decoration: underline;
 }
 
-/* ============================================================
+/*
    CONTENEDOR
-   ============================================================ */
+*/
 .contenedor {
     max-width: 1100px;
     margin: 0 auto;
     padding: 30px 20px;
 }
 
-/* ============================================================
+/*
    BANNER PRINCIPAL
-   ============================================================ */
+*/
 .banner {
     background: #1C1C1E;
     padding: 60px 20px;
@@ -317,9 +317,9 @@ footer {
     color: #fff;
 }
 
-/* ============================================================
+/*
    ENCABEZADO DE SECCION
-   ============================================================ */
+*/
 .seccion-header {
     display: flex;
     justify-content: space-between;
@@ -337,9 +337,9 @@ footer {
     color: #C0392B;
 }
 
-/* ============================================================
+/*
    GRID Y TARJETAS DE EVENTO
-   ============================================================ */
+*/
 .eventos-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -411,9 +411,9 @@ footer {
     color: #8E8E93;
 }
 
-/* ============================================================
+/*
    ETIQUETAS
-   ============================================================ */
+*/
 .etiqueta {
     display: inline-block;
     font-size: 10px;
@@ -431,16 +431,16 @@ footer {
 .etiqueta-competicion { background: #8E44AD; color: #fff; }
 .etiqueta-otro        { background: #8E8E93; color: #fff; }
 
-/* ============================================================
+/*
    ESTADOS
-   ============================================================ */
+*/
 .estado-activo    { color: #27AE60; font-weight: 500; }
 .estado-pendiente { color: #B7770D; font-weight: 500; }
 .estado-bloqueado { color: #922B21; font-weight: 500; }
 
-/* ============================================================
+/*
    FORMULARIOS
-   ============================================================ */
+*/
 .formulario {
     background: #fff;
     border: 1px solid #E5E5EA;
@@ -522,9 +522,9 @@ footer {
     margin-top: 4px;
 }
 
-/* ============================================================
+/*
    ALERTAS
-   ============================================================ */
+*/
 .alerta {
     padding: 10px 14px;
     border-radius: 6px;
@@ -536,9 +536,10 @@ footer {
 .alerta-ok    { background: #EAFAF1; color: #1E8449; border: 1px solid #A9DFBF; }
 .alerta-info  { background: #EBF5FB; color: #1A5276; border: 1px solid #AED6F1; }
 
-/* ============================================================
+/*
    FILTROS
-   ============================================================ */
+*/
+
 .filtros {
     display: flex;
     gap: 10px;
@@ -581,9 +582,9 @@ footer {
     padding: 20px 0;
 }
 
-/* ============================================================
+/*
    DETALLE DE EVENTO
-   ============================================================ */
+*/
 .volver {
     display: inline-block;
     font-size: 13px;
@@ -742,7 +743,7 @@ footer {
     color: #C0392B;
 }
 
-/* Lateral */
+/* Barra Lateral */
 .lateral-card {
     background: #fff;
     border: 1px solid #E5E5EA;
@@ -801,9 +802,9 @@ footer {
     font-weight: 500;
 }
 
-/* ============================================================
+/*
    VEHICULOS
-   ============================================================ */
+*/
 .pagina-titulo {
     font-size: 20px;
     font-weight: 500;
@@ -908,9 +909,9 @@ footer {
     justify-content: flex-end;
 }
 
-/* ============================================================
+/*
    MODALES
-   ============================================================ */
+*/
 .modal-overlay {
     display: none;
     position: fixed;
@@ -959,22 +960,9 @@ footer {
     color: #1C1C1E;
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-@media (max-width: 768px) {
-    .eventos-grid      { grid-template-columns: 1fr; }
-    .vehiculos-grid    { grid-template-columns: 1fr; }
-    .form-2col         { grid-template-columns: 1fr; }
-    .evento-layout     { grid-template-columns: 1fr; }
-    .evento-meta-grid  { grid-template-columns: 1fr 1fr; }
-    .pie-inner         { flex-direction: column; align-items: flex-start; }
-    nav a:not(.btn)    { display: none; }
-}
-
-/* ============================================================
+/*
    PERFIL
-   ============================================================ */
+*/
 .perfil-layout {
     display: grid;
     grid-template-columns: 280px 1fr;
@@ -1172,9 +1160,9 @@ footer {
     max-width: 700px;
 }
 
-/* ============================================================
+/*
    ADMIN
-   ============================================================ */
+*/
 .admin-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1279,15 +1267,6 @@ footer {
     border-bottom: 1px solid #E5E5EA;
 }
 
-/* Responsive perfil y admin */
-@media (max-width: 768px) {
-    .perfil-layout  { grid-template-columns: 1fr; }
-    .admin-stats    { grid-template-columns: repeat(2, 1fr); }
-}
-/* ============================================================
-   NUEVOS ESTILOS — Añadir al final de style.css
-   ============================================================ */
-
 /* Checkboxes grupo */
 .checkboxes-grupo {
     display: flex;
@@ -1376,6 +1355,22 @@ footer {
 
 .tipos-admitidos {
     margin-bottom: 12px;
+}
+
+/* Mapa Leaflet */
+.mapa-contenedor {
+    z-index: 0;
+    position: relative;
+}
+
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom {
+    z-index: 1 !important;
+}
+
+.modal-overlay {
+    z-index: 200;
 }
 
 /* Acciones organizador en detalle evento */
@@ -1514,9 +1509,9 @@ footer {
     letter-spacing: 0.05em;
 }
 
-/* ============================================================
+/* 
    MENSAJES
-   ============================================================ */
+*/
 .lista-mensajes {
     display: flex;
     flex-direction: column;
@@ -1624,9 +1619,9 @@ footer {
     align-items: center;
 }
 
-/* ============================================================
+/* 
    PÁGINAS LEGALES
-   ============================================================ */
+*/
 .pagina-legal h1 {
     font-size: 24px;
     font-weight: 500;
@@ -1649,9 +1644,9 @@ footer {
     margin-bottom: 8px;
 }
 
-/* ============================================================
+/* 
    PÁGINA 404
-   ============================================================ */
+*/
 .pagina-404 {
     text-align: center;
     padding: 80px 20px;
@@ -1677,9 +1672,9 @@ footer {
     margin-bottom: 24px;
 }
 
-/* ============================================================
+/* 
    MENÚ MÓVIL
-   ============================================================ */
+*/
 .nav-escritorio {
     display: flex;
     gap: 20px;
@@ -1730,37 +1725,10 @@ footer {
     background: rgba(255,255,255,.04);
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-@media (max-width: 768px) {
-    .nav-escritorio   { display: none !important; }
-    .hamburguesa      { display: block !important; }
-    .eventos-grid     { grid-template-columns: 1fr; }
-    .vehiculos-grid   { grid-template-columns: 1fr; }
-    .form-2col        { grid-template-columns: 1fr; }
-    .evento-layout    { grid-template-columns: 1fr; }
-    .evento-meta-grid { grid-template-columns: 1fr 1fr; }
-    .perfil-layout    { grid-template-columns: 1fr; }
-    .admin-stats      { grid-template-columns: repeat(2, 1fr); }
-    .pie-inner        { flex-direction: column; align-items: flex-start; }
-}
 
-/* Fix mapa Leaflet debajo de los modales */
-.mapa-contenedor {
-    z-index: 0;
-    position: relative;
-}
-
-.leaflet-pane,
-.leaflet-top,
-.leaflet-bottom {
-    z-index: 1 !important;
-}
-
-.modal-overlay {
-    z-index: 200;
-}
+/*
+    BARRA DE SCROLL PERSONALIZADA
+*/
 
 ::-webkit-scrollbar {
     width: 8px;
@@ -1777,4 +1745,87 @@ footer {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #C0392B;
+}
+
+/* 
+   RESPONSIVE
+*/
+@media (max-width: 768px) {
+    .eventos-grid      { grid-template-columns: 1fr; }
+    .vehiculos-grid    { grid-template-columns: 1fr; }
+    .form-2col         { grid-template-columns: 1fr; }
+    .evento-layout     { grid-template-columns: 1fr; }
+    .evento-meta-grid  { grid-template-columns: 1fr 1fr; }
+    .pie-inner         { flex-direction: column; align-items: flex-start; }
+    nav a:not(.btn)    { display: none; }
+}
+
+@media (max-width: 768px) {
+    .nav-escritorio   { display: none !important; }
+    .hamburguesa      { display: block !important; }
+    .eventos-grid     { grid-template-columns: 1fr; }
+    .vehiculos-grid   { grid-template-columns: 1fr; }
+    .form-2col        { grid-template-columns: 1fr; }
+    .evento-layout    { grid-template-columns: 1fr; }
+    .evento-meta-grid { grid-template-columns: 1fr 1fr; }
+    .perfil-layout    { grid-template-columns: 1fr; }
+    .admin-stats      { grid-template-columns: repeat(2, 1fr); }
+    .pie-inner        { flex-direction: column; align-items: flex-start; }
+}
+
+/* Responsive perfil y admin */
+@media (max-width: 768px) {
+    .perfil-layout  { grid-template-columns: 1fr; }
+    .admin-stats    { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 390px) {
+    .nav {
+        padding: 0 12px;
+    }
+
+    .logo span {
+        font-size: 16px;
+    }
+
+    .contenedor {
+        padding: 20px 12px;
+    }
+
+    .formulario {
+        padding: 20px 14px;
+    }
+
+    .form-2col {
+        grid-template-columns: 1fr;
+    }
+
+    .modal {
+        padding: 20px 14px;
+        margin: 10px;
+    }
+
+    .evento-meta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tarjeta-footer {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    .banner h1 {
+        font-size: 22px;
+    }
+
+    .filtros {
+        flex-direction: column;
+    }
+
+    .filtros input,
+    .filtros select {
+        width: 100%;
+    }
 }

@@ -245,6 +245,18 @@ if ($pct < 50) {
     $color_barra = '#C0392B';
 }
 
+//compruebo si el evento ya ha pasado
+$evento_pasado = strtotime($evento['fecha']) < strtotime('today');
+
+//compruebo si se ha superado el plazo de inscripcion
+$fuera_de_plazo = false;
+if (!empty($evento['fecha_limite_inscripcion'])) {
+    $fuera_de_plazo = strtotime($evento['fecha_limite_inscripcion']) < strtotime('today');
+}
+
+//no se puede inscribir si el evento ha pasado o se ha cerrado el plazo
+$inscripcion_cerrada = $evento_pasado || $fuera_de_plazo;
+
 include 'includes/cabecera.php';
 ?>
 
@@ -398,7 +410,18 @@ include 'includes/cabecera.php';
                         </div>
                     <?php endif; ?>
 
-                    <?php if (isset($_SESSION['usuario'])): ?>
+                    <?php if (!empty($evento['fecha_limite_inscripcion'])): ?>
+                        <p class="tipos-admitidos-label" style="margin-bottom:10px;">
+                            <i class="fa-regular fa-clock"></i>
+                            Plazo: <?= date('d/m/Y', strtotime($evento['fecha_limite_inscripcion'])) ?>
+                        </p>
+                    <?php endif; ?>
+
+                    <?php if ($evento_pasado): ?>
+                        <p class="alerta alerta-error">Este evento ya ha finalizado.</p>
+                    <?php elseif ($fuera_de_plazo): ?>
+                        <p class="alerta alerta-error">El plazo de inscripción ha cerrado.</p>
+                    <?php elseif (isset($_SESSION['usuario'])): ?>
                         <?php if ($inscrito): ?>
                             <p class="alerta alerta-ok">Ya estás inscrito.</p>
                             <a href="/revhub/evento.php?id=<?= $id ?>&desinscribirse=1"
@@ -518,7 +541,7 @@ include 'includes/cabecera.php';
 </main>
 
 <!-- ===== MODAL INSCRIPCIÓN ===== -->
-<?php if (isset($_SESSION['usuario']) && !$inscrito && $inscritos < $evento['max_participantes']): ?>
+<?php if (isset($_SESSION['usuario']) && !$inscrito && !$inscripcion_cerrada && $inscritos < $evento['max_participantes']): ?>
 <div class="modal-overlay" id="modal-inscripcion" <?= $error_ins ? 'style="display:flex;"' : '' ?>>
     <div class="modal">
         <button class="modal-cerrar" onclick="cerrarModal('modal-inscripcion')">&times;</button>

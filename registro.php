@@ -1,11 +1,11 @@
-<?php include 'includes/cabecera.php'; ?>
-
 <?php
+// proceso antes de la cabecera para poder redirigir
+session_start();
+include 'php/conexion.php';
+
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    include 'php/conexion.php';
-
     $nombre    = trim($_POST['nombre']);
     $apellidos = trim($_POST['apellidos']);
     $username  = trim($_POST['username']);
@@ -13,9 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password  = $_POST['password'];
     $password2 = $_POST['password2'];
 
-    // valido los datos
     if (empty($nombre) || empty($apellidos) || empty($username) || empty($email) || empty($password)) {
         $error = 'Todos los campos son obligatorios.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        // valido que el email tenga formato correcto
+        $error = 'El email no tiene un formato válido.';
     } elseif ($password !== $password2) {
         $error = 'Las contraseñas no coinciden.';
     } elseif (strlen($password) < 6) {
@@ -23,17 +25,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $email_esc    = mysqli_real_escape_string($conexion, $email);
         $username_esc = mysqli_real_escape_string($conexion, $username);
-
+        
         // compruebo que el email o el username no existan ya
-        $comprobacion = mysqli_query($conexion,
+        $existe = mysqli_query($conexion,
             "SELECT id_usuario FROM usuarios
              WHERE email = '$email_esc' OR username = '$username_esc'"
         );
 
-        if (mysqli_num_rows($comprobacion) > 0) {
+        if (mysqli_num_rows($existe) > 0) {
             $error = 'El email o el nombre de usuario ya están en uso.';
         } else {
-            //cifro la contraseña y creo el usuario
+            //cifrado de la contraseña
             $hash          = password_hash($password, PASSWORD_BCRYPT);
             $nombre_esc    = mysqli_real_escape_string($conexion, $nombre);
             $apellidos_esc = mysqli_real_escape_string($conexion, $apellidos);
@@ -42,11 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 "INSERT INTO usuarios (nombre, apellidos, username, email, contrasena)
                  VALUES ('$nombre_esc', '$apellidos_esc', '$username_esc', '$email_esc', '$hash')"
             );
-
+            
+            // si se ha insertado correctamente, inicio sesión y redirijo al inicio
             if ($insertar) {
-                //inicio sesion automaticamente y redirijo al inicio
                 $id = mysqli_insert_id($conexion);
-
                 $_SESSION['usuario']  = $id;
                 $_SESSION['username'] = $username;
                 $_SESSION['nombre']   = $nombre;
@@ -60,6 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+include 'includes/cabecera.php';
 ?>
 
 <main>
