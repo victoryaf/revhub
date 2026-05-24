@@ -125,12 +125,12 @@ INSERT INTO usuarios (nombre, apellidos, username, email, contrasena, rol) VALUE
 ('Carlos',   'Rodríguez Vidal',  'carlos',   'carlos@revhub.es',   '$2y$10$dHt41aYNkx3QO94u.1lqH.JjFbw2KxN6bb30gAEvCL5udXmfY.Qz.', 'usuario'),
 ('Marta',    'Fernández Torres', 'marta',    'marta@revhub.es',    '$2y$10$dHt41aYNkx3QO94u.1lqH.JjFbw2KxN6bb30gAEvCL5udXmfY.Qz.', 'usuario');
 
-INSERT INTO vehiculos (id_usuario, marca, modelo, anio, color, tipo_vehiculo, matricula, descripcion) VALUES
-(2, 'Ford',     'Mustang',   1969, 'Rojo',    'clasico',   'GH-3421-B', 'Mustang clásico restaurado, motor V8 original'),
-(3, 'Honda',    'Civic EK9', 1998, 'Plata',   'tuning',    'OR-1122-C', 'Civic con preparación JDM'),
-(4, 'Porsche',  '911 GT3',   2018, 'Amarillo','deportivo', 'PO-5544-D', 'GT3 de pista'),
-(5, 'Kawasaki', 'Z900',      2021, 'Negro',   'moto',      'MA-9988-A', 'Naked sport, escape Akrapovic'),
-(1, 'SEAT',     'Ibiza',     2005, 'Azul',    'tuning',    'LU-7712-F', 'Preparación motorsport');
+INSERT INTO vehiculos (id_usuario, marca, modelo, anio, color, tipo_vehiculo, matricula, descripcion, modificaciones, imagen) VALUES
+(2, 'Ford',     'Mustang',   1969, 'Rojo',    'clasico',   'GH-3421-B', 'Mustang clásico restaurado, motor V8 original', NULL, 'mustang.jpg'),
+(3, 'Honda',    'Civic EK9', 1998, 'Plata',   'tuning',    'OR-1122-C', 'Civic con preparación JDM', NULL, 'civic.jpg'),
+(4, 'Porsche',  '911 GT3',   2018, 'Amarillo','deportivo', 'PO-5544-D', 'GT3 de pista', NULL, 'porsche.jpg'),
+(5, 'Kawasaki', 'Z900',      2021, 'Negro',   'moto',      'MA-9988-A', 'Naked sport, escape Akrapovic', NULL, 'z900.jpg'),
+(1, 'Yamaha',   'YZFR125',     2010, 'Negro',    'moto',    '6123-GXB', 'R deportiva, escape Austin Racing', NULL, 'yzfr125.jpg');
 
 INSERT INTO eventos (id_usuario, nombre, descripcion, fecha, hora, ubicacion, max_participantes, tipo_evento, tipos_admitidos, marcas_admitidas, salida, destino, puntos_intermedios, cartel) VALUES
 (2, 'Quedada Clásicos Valdeorras 2026', 'Encuentro de vehículos clásicos en Petín.',      '2026-06-15', '10:00:00', 'Petín, Ourense',      50, 'quedada',   NULL, NULL, NULL, NULL, NULL, 'PetinPiston.png'),
