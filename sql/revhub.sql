@@ -150,4 +150,4 @@ INSERT INTO comentarios (id_usuario, id_evento, texto) VALUES
 (3, 1, '¿Hay zona de aparcamiento para los vehículos participantes?'),
 (4, 1, 'El año pasado fui y fue genial, muy buena organización.'),
 (5, 2, '¿Se admiten motos de menos de 600cc?'),
-(3, 3, 'Apuntada con el Civic, espero que haya muchos tuning este año.');
+(3, 3, 'Apuntada con el Civic, espero que haya muchos tuning esta edición.');
